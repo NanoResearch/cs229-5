@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
 
 typedef struct cell{
     char symbol;
@@ -8,8 +9,17 @@ typedef struct cell{
     int mutable;
 } cell;
 
+typedef struct room{
+    int startX;
+    int startY;
+    int endX;
+    int endY;
+} room;
+
 typedef struct dungeon{
-    cell map[160][96];
+    int numRooms;
+    cell cell[160][96];
+    room rooms[12];
 } dungeon;
 
 void printDungeon(dungeon *dungeon)
@@ -19,7 +29,7 @@ void printDungeon(dungeon *dungeon)
     {
         for (x = 0; x < 160; x++)
         {
-            printf("%c", dungeon->map[x][y].symbol);
+            printf("%c", dungeon->cell[x][y].symbol);
         }
         printf("\n");
     }
@@ -123,6 +133,7 @@ int createRoom(int startX, int startY, dungeon *dungeon)
 void generateDungeon()
 {    
     dungeon dungeon;
+    dungeon.numRooms = 0;
 
     int x, y;
 
@@ -130,13 +141,29 @@ void generateDungeon()
     {
         for (x = 0; x < 160; x++)
         {
-            cell *cell = &dungeon.map[x][y];
+            cell *cell;
+            if (!(cell = malloc(sizeof (*cell)))) {
+                perror("malloc");
+                exit(1);
+            }
+            cell = &dungeon.cell[x][y];
             cell->symbol = '#'; 
             cell->mutable = isOutermostWall(x, y);
             
             /* assigns the cell a hardness between 0 and 6 this isn't the */
             /* most random, but works for our purposes */
             cell->hardness = rand() % 7;
+        }
+    }
+    int roomCount = 0;
+    while (roomCount < 12)
+    {
+        int startX = rand() % 160;
+        int startY = rand() % 96;
+        // printf("about to create room\n");
+        if (createRoom(startX, startY, &dungeon) == 1)
+        {
+            roomCount++;
         }
     }
     printDungeon(&dungeon);
