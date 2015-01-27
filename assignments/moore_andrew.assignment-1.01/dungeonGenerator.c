@@ -38,6 +38,36 @@ int isOutermostWall(int x, int y)
     }
 }
 
+int passesHausdorff(dungeon *dungeon, room *testRoom)
+{
+    int i, j, k, l, m;
+
+    if (dungeon->numRooms <= 0)
+    {
+        return 1;
+    }
+
+    for (i = 0; i < dungeon->numRooms; i++)
+    {
+        for (j = dungeon->rooms[i].startX; j <= dungeon->rooms[i].endX; j++)
+        {
+            for (k = dungeon->rooms[i].startY; k <= dungeon->rooms[i].endY; k++)
+            {
+                for (l = testRoom->startX; l <= testRoom->endX; l++)
+                {
+                    for (m = testRoom->startY; m <= testRoom->endY; m++)
+                    {
+                        if (sqrt((j - l) * (j - l) + (k - m) * (k - m)) <= 6)
+                        {
+                            return -1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 1;
+}
 void generateDungeon()
 {    
     dungeon dungeon;
@@ -49,7 +79,7 @@ void generateDungeon()
         for (x = 0; x < 160; x++)
         {
             cell *cell = &dungeon.map[x][y];
-            cell->symbol = '#';
+            cell->symbol = '#'; 
             cell->mutable = isOutermostWall(x, y);
             
             /* assigns the cell a hardness between 0 and 6 this isn't the */
