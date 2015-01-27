@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 typedef struct cell{
     char symbol;
@@ -50,6 +51,10 @@ void generateDungeon()
             cell *cell = &dungeon.map[x][y];
             cell->symbol = '#';
             cell->mutable = isOutermostWall(x, y);
+            
+            /* assigns the cell a hardness between 0 and 6 this isn't the */
+            /* most random, but works for our purposes */
+            cell->hardness = rand() % 7;
         }
     }
     printDungeon(&dungeon);
@@ -57,6 +62,7 @@ void generateDungeon()
 
 int main (int argc, char *argv[])
 {
+    srand(time(NULL));
     generateDungeon();
 
     return 0;
