@@ -1,0 +1,5 @@
+/lecture
+*.pdf
+*.gz
+*.out
+*.o
