@@ -68,6 +68,58 @@ int passesHausdorff(dungeon *dungeon, room *testRoom)
     }
     return 1;
 }
+
+int createRoom(int startX, int startY, dungeon *dungeon)
+{
+    int x, y;
+    int endX = startX + 8 + rand() % 35;
+    int endY = startY + 5 + rand() % 10;
+
+    if (dungeon->numRooms == 12)
+    {
+        return -1;
+    }
+
+    if (startX < 0 || startY < 0)
+    {
+        return -1;
+    }
+
+    if (endX >= 160 || endY >= 96)
+    {
+        return -1;
+    }
+
+    if (isOutermostWall(startX, startY) == 1 || isOutermostWall(endX, endY) == 1)
+    {
+        return -1;
+    }
+
+    room testRoom;
+    testRoom.startX = startX;
+    testRoom.startY = startY;
+    testRoom.endX = endX;
+    testRoom.endY = endY;
+
+    if (passesHausdorff(dungeon, &testRoom) == -1)
+    {
+        return -1;
+    }
+
+    for (y = startY; y <= endY; y++)
+    {
+        for (x = startX; x <= endX; x++)
+        {
+            dungeon->cell[x][y].symbol = '.';
+        }
+    }
+
+    dungeon->rooms[dungeon->numRooms] = testRoom;
+    dungeon->numRooms++;
+
+    return 1;
+}
+
 void generateDungeon()
 {    
     dungeon dungeon;
