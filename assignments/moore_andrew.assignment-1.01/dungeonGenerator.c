@@ -22,6 +22,13 @@ typedef struct dungeon{
     room rooms[12];
 } dungeon;
 
+/*
+ * Function:    print_dungeon
+ * --------------------------
+ * prints the dungeon map to the console
+ *  
+ *  dungeon: the dungeon to print to the console
+ */
 void printDungeon(dungeon *dungeon)
 {
     int x, y;
@@ -36,6 +43,16 @@ void printDungeon(dungeon *dungeon)
     printf("\n");
 }
 
+/*
+ * Function:    is_outermost_wall
+ * ------------------------------
+ * checks whether the given x and y values are part of the dungeon border
+ *  
+ *  x: x coordinate to check
+ *  y: y coordinate to check
+ *
+ *  returns: 1 if the coordinates are part of the wall, -1 otherwise
+ */
 int isOutermostWall(int x, int y)
 {
     if (x == 0 || x == 159 || y == 0 || y == 95)
@@ -48,6 +65,19 @@ int isOutermostWall(int x, int y)
     }
 }
 
+/*
+ * Function:    passes_hausdorff
+ * -----------------------------
+ * checks whether the given room is further than hausdorff's distance from all
+ * other rooms in the given dungeon
+ *  
+ *  dungeon: dungeon with rooms to check against
+ *  testRoom: room to compare with current dungeon rooms
+ *
+ *  returns: 1 if the rooms hausdorff distance is greater than 3 from all
+ *           other rooms
+ *           in the dungeon
+ */
 int passesHausdorff(dungeon *dungeon, room *testRoom)
 {
     int i, j, k, l, m;
@@ -79,6 +109,18 @@ int passesHausdorff(dungeon *dungeon, room *testRoom)
     return 1;
 }
 
+/*
+ * Function:    create_room
+ * ------------------------
+ * creates a room and adds it to the given dungeon if it has all the valid
+ * criterion
+ *  
+ *  startX: starting x coordinate of the room
+ *  startY: starting y coordinate of the room
+ *  dungeon: dungeon that will contain the new room
+ *
+ *  returns: 1 if the room is added successfully, -1 otherwise
+ */
 int createRoom(int startX, int startY, dungeon *dungeon)
 {
     int x, y;
@@ -130,6 +172,11 @@ int createRoom(int startX, int startY, dungeon *dungeon)
     return 1;
 }
 
+/*
+ * Function:    generate_dungeon
+ * -----------------------------
+ * generates a random dungeon
+ */
 void generateDungeon()
 {    
     dungeon dungeon;
