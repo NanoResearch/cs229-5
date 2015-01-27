@@ -172,6 +172,39 @@ int createRoom(int startX, int startY, dungeon *dungeon)
     return 1;
 }
 
+void connect_points(dungeon *dungeon, int x1, int y1, int x2, int y2)
+{
+    int x_diff = x1 - x2;
+    int y_diff = y1 - y2;
+
+    while (x_diff != 0)
+    {
+        if (x_diff < 0)
+        {
+            x1++;
+        }
+        else
+        {
+            x1--;
+        }
+        dungeon->cell[x1][y1].symbol = '.';
+        x_diff = x1 - x2;
+    }
+
+    while (y_diff != 0)
+    {
+        if (y_diff < 0)
+        {
+            y1++;
+        }
+        else
+        {
+            y1--;
+        }
+        dungeon->cell[x1][y1].symbol = '.';
+        y_diff = y1 - y2;
+    }
+}
 /*
  * Function:    generate_dungeon
  * -----------------------------
