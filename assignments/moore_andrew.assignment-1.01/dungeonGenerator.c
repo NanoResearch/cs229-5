@@ -97,7 +97,7 @@ int passesHausdorff(dungeon *dungeon, room *testRoom)
                 {
                     for (m = testRoom->startY; m <= testRoom->endY; m++)
                     {
-                        if (sqrt((j - l) * (j - l) + (k - m) * (k - m)) <= 6)
+                        if (sqrt(pow(j - l, 2) + pow(k - m, 2)) <= 6)
                         {
                             return -1;
                         }
