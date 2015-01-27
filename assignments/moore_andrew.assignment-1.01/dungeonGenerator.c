@@ -25,6 +25,18 @@ void printDungeon(dungeon *dungeon)
     printf("\n");
 }
 
+int isOutermostWall(int x, int y)
+{
+    if (x == 0 || x == 159 || y == 0 || y == 95)
+    {
+        return 1;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
 void generateDungeon()
 {    
     dungeon dungeon;
@@ -37,6 +49,7 @@ void generateDungeon()
         {
             cell *cell = &dungeon.map[x][y];
             cell->symbol = '#';
+            cell->mutable = isOutermostWall(x, y);
         }
     }
     printDungeon(&dungeon);
