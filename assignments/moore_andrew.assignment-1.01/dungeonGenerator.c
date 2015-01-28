@@ -173,7 +173,6 @@ int createRoom(int startX, int startY, dungeon *dungeon)
     return 1;
 }
 
-void connect_rooms(dungeon *dungeon, int x1, int y1, int x2, int y2)
 /*
  * Function:    connect_points
  * ----------------------------
