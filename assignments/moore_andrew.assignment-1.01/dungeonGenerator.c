@@ -3,12 +3,24 @@
 #include <time.h>
 #include <math.h>
 
+/*
+ * Structure:   cell
+ * ---------------------
+ * the cell contains a symbol that can be printed to the console,
+ * a hardness rating, and a mutable flag
+ */
 typedef struct cell{
     char symbol;
     int hardness;
     int mutable;
 } cell;
 
+/*
+ * Structure:   room
+ * ---------------------
+ * the room contains x and y values (coordinates) for both the start
+ * of the room and the end of the room
+ */
 typedef struct room{
     int startX;
     int startY;
@@ -16,6 +28,12 @@ typedef struct room{
     int endY;
 } room;
 
+/*
+ * Structure:   dungeon
+ * ---------------------
+ * the dungeon structure contains a 160 x 96 array of cells and 
+ * an array of 12 rooms
+ */
 typedef struct dungeon{
     int numRooms;
     cell cell[160][96];
@@ -258,6 +276,7 @@ void generateDungeon()
     }
     dungeon->numRooms = 0;
 
+    /* fill entire dungeon with rock (#) */
     int x, y;
     for (y = 0; y < 96; y++)
     {
@@ -269,6 +288,7 @@ void generateDungeon()
         }
     }
     
+    /* carve out 12 rooms into the dungeon */
     int roomCount = 0;
     while (roomCount < 12)
     {
@@ -279,8 +299,11 @@ void generateDungeon()
             roomCount++;
         }
     }
+
     create_corridors(dungeon);
+
     printDungeon(dungeon);
+    
     free(dungeon);
 }
 
