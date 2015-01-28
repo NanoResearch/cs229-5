@@ -1,0 +1,31 @@
+=================
+||  CHANGELOG  ||
+=================
+
+1-24-15
+========
+initial commit
+add Makefile, README, and CHANGELOG
+update git ignore file
+add dungeonGenerator file
+print dungeon without rooms and cooridors
+
+1-25-15
+========
+add is_outermost_wall method
+add random hardness to each cell in the dungeon
+add method to test hausdorff distance
+add method to create a rooms
+generate a dungeon with random room placement completed
+
+1-26-15
+========
+add comments to functions
+start using pow() function for distance formulas
+add simplest method to connect two points in the dungeon
+
+1-27-15
+========
+add ability to make very basic corridors
+use malloc on the whole dungeon instead of each cell
+update CHANGELOG
