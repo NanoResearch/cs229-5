@@ -142,7 +142,8 @@ int createRoom(int startX, int startY, dungeon *dungeon)
         return -1;
     }
 
-    if (isOutermostWall(startX, startY) == 1 || isOutermostWall(endX, endY) == 1)
+    if (isOutermostWall(startX, startY) == 1 ||
+        isOutermostWall(endX, endY) == 1)
     {
         return -1;
     }
@@ -172,7 +173,7 @@ int createRoom(int startX, int startY, dungeon *dungeon)
     return 1;
 }
 
-void connect_points(dungeon *dungeon, int x1, int y1, int x2, int y2)
+void connect_rooms(dungeon *dungeon, int x1, int y1, int x2, int y2)
 {
     int x_diff = x1 - x2;
     int y_diff = y1 - y2;
@@ -205,24 +206,40 @@ void connect_points(dungeon *dungeon, int x1, int y1, int x2, int y2)
         y_diff = y1 - y2;
     }
 }
+
+void create_corridors(dungeon *dungeon)
+{
+    int i;
+    int room1X, room1Y, room2X, room2Y;
+
+    for (i = 1; i < 12; i++)
+    {
+        room1X = dungeon->rooms[i - 1].startX + (dungeon->rooms[i - 1].endX - dungeon->rooms[i - 1].startX) / 2;
+        room1Y = dungeon->rooms[i - 1].startY + (dungeon->rooms[i - 1].endY - dungeon->rooms[i - 1].startY) / 2;
+        room2X = dungeon->rooms[i].startX + (dungeon->rooms[i].endX - dungeon->rooms[i].startX) / 2;
+        room2Y = dungeon->rooms[i].startY + (dungeon->rooms[i].endY - dungeon->rooms[i].startY) / 2;
+        connect_rooms(dungeon, room1X, room1Y, room2X, room2Y);
+    }
+}
+
 /*
  * Function:    generate_dungeon
  * -----------------------------
  * generates a random dungeon
  */
 void generateDungeon()
-{    
+{
     dungeon dungeon;
     dungeon.numRooms = 0;
 
     int x, y;
-
     for (y = 0; y < 96; y++)
     {
         for (x = 0; x < 160; x++)
         {
             cell *cell;
-            if (!(cell = malloc(sizeof (*cell)))) {
+            if (!(cell = malloc(sizeof (*cell))))
+            {
                 perror("malloc");
                 exit(1);
             }
@@ -235,6 +252,7 @@ void generateDungeon()
             cell->hardness = rand() % 7;
         }
     }
+    
     int roomCount = 0;
     while (roomCount < 12)
     {
@@ -246,6 +264,9 @@ void generateDungeon()
             roomCount++;
         }
     }
+
+    create_corridors(&dungeon);
+
     printDungeon(&dungeon);
 }
 
@@ -253,6 +274,5 @@ int main (int argc, char *argv[])
 {
     srand(time(NULL));
     generateDungeon();
-
     return 0;
 }
