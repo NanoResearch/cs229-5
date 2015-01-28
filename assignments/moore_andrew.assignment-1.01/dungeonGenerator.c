@@ -174,6 +174,18 @@ int createRoom(int startX, int startY, dungeon *dungeon)
 }
 
 void connect_rooms(dungeon *dungeon, int x1, int y1, int x2, int y2)
+/*
+ * Function:    connect_points
+ * ----------------------------
+ * given a dungeon and two points, connects the two points in the dungeon
+ *  
+ *  dungeon: starting x coordinate of the room
+ *  x1: x location of point one
+ *  y1: y location of point one
+ *  x2: x location of point two
+ *  y2: y location of point two
+ */
+void connect_points(dungeon *dungeon, int x1, int y1, int x2, int y2)
 {
     int x_diff = x1 - x2;
     int y_diff = y1 - y2;
@@ -207,6 +219,15 @@ void connect_rooms(dungeon *dungeon, int x1, int y1, int x2, int y2)
     }
 }
 
+/*
+ * Function:    create_corridors
+ * ------------------------------
+ * loops through the rooms stored in a given dungeon and connects
+ * the rooms one by one
+ *
+ *  dungeon: dungeon the corridors will be added to
+ *
+ */
 void create_corridors(dungeon *dungeon)
 {
     int i;
@@ -218,7 +239,7 @@ void create_corridors(dungeon *dungeon)
         room1Y = dungeon->rooms[i - 1].startY + (dungeon->rooms[i - 1].endY - dungeon->rooms[i - 1].startY) / 2;
         room2X = dungeon->rooms[i].startX + (dungeon->rooms[i].endX - dungeon->rooms[i].startX) / 2;
         room2Y = dungeon->rooms[i].startY + (dungeon->rooms[i].endY - dungeon->rooms[i].startY) / 2;
-        connect_rooms(dungeon, room1X, room1Y, room2X, room2Y);
+        connect_points(dungeon, room1X, room1Y, room2X, room2Y);
     }
 }
 
@@ -229,27 +250,23 @@ void create_corridors(dungeon *dungeon)
  */
 void generateDungeon()
 {
-    dungeon dungeon;
-    dungeon.numRooms = 0;
+    /* initialize dungeon */
+    dungeon *dungeon;
+    if (!(dungeon = malloc(sizeof(*dungeon))))
+    {
+        perror("malloc");
+        exit(1);
+    }
+    dungeon->numRooms = 0;
 
     int x, y;
     for (y = 0; y < 96; y++)
     {
         for (x = 0; x < 160; x++)
         {
-            cell *cell;
-            if (!(cell = malloc(sizeof (*cell))))
-            {
-                perror("malloc");
-                exit(1);
-            }
-            cell = &dungeon.cell[x][y];
-            cell->symbol = '#'; 
-            cell->mutable = isOutermostWall(x, y);
-            
-            /* assigns the cell a hardness between 0 and 6 this isn't the */
-            /* most random, but works for our purposes */
-            cell->hardness = rand() % 7;
+            dungeon->cell[x][y].symbol = '#';
+            dungeon->cell[x][y].mutable = isOutermostWall(x, y);
+            dungeon->cell[x][y].hardness = rand() % 7;
         }
     }
     
@@ -258,16 +275,14 @@ void generateDungeon()
     {
         int startX = rand() % 160;
         int startY = rand() % 96;
-        // printf("about to create room\n");
-        if (createRoom(startX, startY, &dungeon) == 1)
+        if (createRoom(startX, startY, dungeon) == 1)
         {
             roomCount++;
         }
     }
-
-    create_corridors(&dungeon);
-
-    printDungeon(&dungeon);
+    create_corridors(dungeon);
+    printDungeon(dungeon);
+    free(dungeon);
 }
 
 int main (int argc, char *argv[])
