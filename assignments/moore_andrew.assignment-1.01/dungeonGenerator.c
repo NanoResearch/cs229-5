@@ -268,13 +268,8 @@ void create_corridors(dungeon *dungeon)
 void generateDungeon()
 {
     /* initialize dungeon */
-    dungeon *dungeon;
-    if (!(dungeon = malloc(sizeof(*dungeon))))
-    {
-        perror("malloc");
-        exit(1);
-    }
-    dungeon->numRooms = 0;
+    dungeon dungeon;
+    dungeon.numRooms = 0;
 
     /* fill entire dungeon with rock (#) */
     int x, y;
@@ -282,9 +277,9 @@ void generateDungeon()
     {
         for (x = 0; x < 160; x++)
         {
-            dungeon->cell[x][y].symbol = '#';
-            dungeon->cell[x][y].mutable = isOutermostWall(x, y);
-            dungeon->cell[x][y].hardness = rand() % 7;
+            dungeon.cell[x][y].symbol = '#';
+            dungeon.cell[x][y].mutable = isOutermostWall(x, y);
+            dungeon.cell[x][y].hardness = rand() % 7;
         }
     }
     
@@ -294,17 +289,15 @@ void generateDungeon()
     {
         int startX = rand() % 160;
         int startY = rand() % 96;
-        if (createRoom(startX, startY, dungeon) == 1)
+        if (createRoom(startX, startY, &dungeon) == 1)
         {
             roomCount++;
         }
     }
 
-    create_corridors(dungeon);
+    create_corridors(&dungeon);
 
-    printDungeon(dungeon);
-    
-    free(dungeon);
+    printDungeon(&dungeon);
 }
 
 int main (int argc, char *argv[])
