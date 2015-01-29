@@ -3,6 +3,16 @@
 #include <time.h>
 #include <math.h>
 
+#define DUNGEON_X           160
+#define DUNGEON_Y           96
+#define MIN_ROOMS           12
+#define MAX_ROOMS           20
+#define ROOM_MIN_X          8
+#define ROOM_MIN_Y          5
+#define ROOM_MAX_X          35
+#define ROOM_MAX_Y          10
+#define ROOM_SEPARATION     6
+
 /*
  * Structure:   cell
  * ---------------------
@@ -13,7 +23,7 @@ typedef struct cell{
     char symbol;
     int hardness;
     int mutable;
-} cell;
+} cell_t;
 
 /*
  * Structure:   room
@@ -22,11 +32,11 @@ typedef struct cell{
  * of the room and the end of the room
  */
 typedef struct room{
-    int startX;
-    int startY;
-    int endX;
-    int endY;
-} room;
+    int start_x;
+    int start_y;
+    int end_x;
+    int end_y;
+} room_t;
 
 /*
  * Structure:   dungeon
@@ -35,10 +45,10 @@ typedef struct room{
  * an array of 12 rooms
  */
 typedef struct dungeon{
-    int numRooms;
-    cell cell[160][96];
-    room rooms[12];
-} dungeon;
+    int num_rooms;
+    cell_t cell[DUNGEON_X][DUNGEON_Y];
+    room_t rooms[MIN_ROOMS];
+} dungeon_t;
 
 /*
  * Function:    print_dungeon
@@ -47,12 +57,12 @@ typedef struct dungeon{
  *  
  *  dungeon: the dungeon to print to the console
  */
-void printDungeon(dungeon *dungeon)
+void print_dungeon(dungeon_t *dungeon)
 {
     int x, y;
-    for (y = 0; y < 96; y++)
+    for (y = 0; y < DUNGEON_Y; y++)
     {
-        for (x = 0; x < 160; x++)
+        for (x = 0; x < DUNGEON_X; x++)
         {
             printf("%c", dungeon->cell[x][y].symbol);
         }
@@ -71,9 +81,9 @@ void printDungeon(dungeon *dungeon)
  *
  *  returns: 1 if the coordinates are part of the wall, -1 otherwise
  */
-int isOutermostWall(int x, int y)
+int is_outermost_wall(int x, int y)
 {
-    if (x == 0 || x == 159 || y == 0 || y == 95)
+    if (x == 0 || x == DUNGEON_X - 1 || y == 0 || y == DUNGEON_Y - 1)
     {
         return 1;
     }
@@ -90,32 +100,32 @@ int isOutermostWall(int x, int y)
  * other rooms in the given dungeon
  *  
  *  dungeon: dungeon with rooms to check against
- *  testRoom: room to compare with current dungeon rooms
+ *  test_room: room to compare with current dungeon rooms
  *
  *  returns: 1 if the rooms hausdorff distance is greater than 3 from all
  *           other rooms
  *           in the dungeon
  */
-int passesHausdorff(dungeon *dungeon, room *testRoom)
+int passes_hausdorff(dungeon_t *dungeon, room_t *test_room)
 {
     int i, j, k, l, m;
 
-    if (dungeon->numRooms <= 0)
+    if (dungeon->num_rooms <= 0)
     {
         return 1;
     }
 
-    for (i = 0; i < dungeon->numRooms; i++)
+    for (i = 0; i < dungeon->num_rooms; i++)
     {
-        for (j = dungeon->rooms[i].startX; j <= dungeon->rooms[i].endX; j++)
+        for (j = dungeon->rooms[i].start_x; j <= dungeon->rooms[i].end_x; j++)
         {
-            for (k = dungeon->rooms[i].startY; k <= dungeon->rooms[i].endY; k++)
+            for (k = dungeon->rooms[i].start_y; k <= dungeon->rooms[i].end_y; k++)
             {
-                for (l = testRoom->startX; l <= testRoom->endX; l++)
+                for (l = test_room->start_x; l <= test_room->end_x; l++)
                 {
-                    for (m = testRoom->startY; m <= testRoom->endY; m++)
+                    for (m = test_room->start_y; m <= test_room->end_y; m++)
                     {
-                        if (sqrt(pow(j - l, 2) + pow(k - m, 2)) <= 6)
+                        if (sqrt(pow(j - l, 2) + pow(k - m, 2)) <= ROOM_SEPARATION)
                         {
                             return -1;
                         }
@@ -133,60 +143,60 @@ int passesHausdorff(dungeon *dungeon, room *testRoom)
  * creates a room and adds it to the given dungeon if it has all the valid
  * criterion
  *  
- *  startX: starting x coordinate of the room
- *  startY: starting y coordinate of the room
+ *  start_x: starting x coordinate of the room
+ *  start_y: starting y coordinate of the room
  *  dungeon: dungeon that will contain the new room
  *
  *  returns: 1 if the room is added successfully, -1 otherwise
  */
-int createRoom(int startX, int startY, dungeon *dungeon)
+int create_room(int start_x, int start_y, dungeon_t *dungeon)
 {
     int x, y;
-    int endX = startX + 8 + rand() % 35;
-    int endY = startY + 5 + rand() % 10;
+    int end_x = start_x + ROOM_MIN_X + rand() % ROOM_MAX_X;
+    int end_y = start_y + ROOM_MIN_Y + rand() % ROOM_MAX_Y;
 
-    if (dungeon->numRooms == 12)
+    if (dungeon->num_rooms == MIN_ROOMS)
     {
         return -1;
     }
 
-    if (startX < 0 || startY < 0)
+    if (start_x < 0 || start_y < 0)
     {
         return -1;
     }
 
-    if (endX >= 160 || endY >= 96)
+    if (end_x >= DUNGEON_X || end_y >= DUNGEON_Y)
     {
         return -1;
     }
 
-    if (isOutermostWall(startX, startY) == 1 ||
-        isOutermostWall(endX, endY) == 1)
+    if (is_outermost_wall(start_x, start_y) == 1 ||
+        is_outermost_wall(end_x, end_y) == 1)
     {
         return -1;
     }
 
-    room testRoom;
-    testRoom.startX = startX;
-    testRoom.startY = startY;
-    testRoom.endX = endX;
-    testRoom.endY = endY;
+    room_t test_room;
+    test_room.start_x = start_x;
+    test_room.start_y = start_y;
+    test_room.end_x = end_x;
+    test_room.end_y = end_y;
 
-    if (passesHausdorff(dungeon, &testRoom) == -1)
+    if (passes_hausdorff(dungeon, &test_room) == -1)
     {
         return -1;
     }
 
-    for (y = startY; y <= endY; y++)
+    for (y = start_y; y <= end_y; y++)
     {
-        for (x = startX; x <= endX; x++)
+        for (x = start_x; x <= end_x; x++)
         {
             dungeon->cell[x][y].symbol = '.';
         }
     }
 
-    dungeon->rooms[dungeon->numRooms] = testRoom;
-    dungeon->numRooms++;
+    dungeon->rooms[dungeon->num_rooms] = test_room;
+    dungeon->num_rooms++;
 
     return 1;
 }
@@ -202,7 +212,7 @@ int createRoom(int startX, int startY, dungeon *dungeon)
  *  x2: x location of point two
  *  y2: y location of point two
  */
-void connect_points(dungeon *dungeon, int x1, int y1, int x2, int y2)
+void connect_points(dungeon_t *dungeon, int x1, int y1, int x2, int y2)
 {
     int x_diff = x1 - x2;
     int y_diff = y1 - y2;
@@ -245,17 +255,17 @@ void connect_points(dungeon *dungeon, int x1, int y1, int x2, int y2)
  *  dungeon: dungeon the corridors will be added to
  *
  */
-void create_corridors(dungeon *dungeon)
+void create_corridors(dungeon_t *dungeon)
 {
     int i;
     int room1X, room1Y, room2X, room2Y;
 
-    for (i = 1; i < 12; i++)
+    for (i = 1; i < MIN_ROOMS; i++)
     {
-        room1X = dungeon->rooms[i - 1].startX + (dungeon->rooms[i - 1].endX - dungeon->rooms[i - 1].startX) / 2;
-        room1Y = dungeon->rooms[i - 1].startY + (dungeon->rooms[i - 1].endY - dungeon->rooms[i - 1].startY) / 2;
-        room2X = dungeon->rooms[i].startX + (dungeon->rooms[i].endX - dungeon->rooms[i].startX) / 2;
-        room2Y = dungeon->rooms[i].startY + (dungeon->rooms[i].endY - dungeon->rooms[i].startY) / 2;
+        room1X = dungeon->rooms[i - 1].start_x + (dungeon->rooms[i - 1].end_x - dungeon->rooms[i - 1].start_x) / 2;
+        room1Y = dungeon->rooms[i - 1].start_y + (dungeon->rooms[i - 1].end_y - dungeon->rooms[i - 1].start_y) / 2;
+        room2X = dungeon->rooms[i].start_x + (dungeon->rooms[i].end_x - dungeon->rooms[i].start_x) / 2;
+        room2Y = dungeon->rooms[i].start_y + (dungeon->rooms[i].end_y - dungeon->rooms[i].start_y) / 2;
         connect_points(dungeon, room1X, room1Y, room2X, room2Y);
     }
 }
@@ -265,31 +275,31 @@ void create_corridors(dungeon *dungeon)
  * -----------------------------
  * generates a random dungeon
  */
-void generateDungeon()
+void generate_dungeon()
 {
     /* initialize dungeon */
-    dungeon dungeon;
-    dungeon.numRooms = 0;
+    dungeon_t dungeon;
+    dungeon.num_rooms = 0;
 
     /* fill entire dungeon with rock (#) */
     int x, y;
-    for (y = 0; y < 96; y++)
+    for (y = 0; y < DUNGEON_Y; y++)
     {
-        for (x = 0; x < 160; x++)
+        for (x = 0; x < DUNGEON_X; x++)
         {
             dungeon.cell[x][y].symbol = '#';
-            dungeon.cell[x][y].mutable = isOutermostWall(x, y);
+            dungeon.cell[x][y].mutable = is_outermost_wall(x, y);
             dungeon.cell[x][y].hardness = rand() % 7;
         }
     }
     
     /* carve out 12 rooms into the dungeon */
     int roomCount = 0;
-    while (roomCount < 12)
+    while (roomCount < MIN_ROOMS)
     {
-        int startX = rand() % 160;
-        int startY = rand() % 96;
-        if (createRoom(startX, startY, &dungeon) == 1)
+        int start_x = rand() % DUNGEON_X;
+        int start_y = rand() % DUNGEON_Y;
+        if (create_room(start_x, start_y, &dungeon) == 1)
         {
             roomCount++;
         }
@@ -297,12 +307,12 @@ void generateDungeon()
 
     create_corridors(&dungeon);
 
-    printDungeon(&dungeon);
+    print_dungeon(&dungeon);
 }
 
 int main (int argc, char *argv[])
 {
     srand(time(NULL));
-    generateDungeon();
+    generate_dungeon();
     return 0;
 }
