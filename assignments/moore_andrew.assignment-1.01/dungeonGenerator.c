@@ -3,25 +3,24 @@
 #include <time.h>
 #include <math.h>
 
-#define DUNGEON_X           160
-#define DUNGEON_Y           96
-#define MIN_ROOMS           12
-#define MAX_ROOMS           20
-#define ROOM_MIN_X          8
-#define ROOM_MIN_Y          5
-#define ROOM_MAX_X          35
-#define ROOM_MAX_Y          10
-#define ROOM_SEPARATION     6
+#define DUNGEON_X       160
+#define DUNGEON_Y       96
+#define MIN_ROOMS       12
+#define MAX_ROOMS       20
+#define ROOM_MIN_X      8
+#define ROOM_MIN_Y      5
+#define ROOM_MAX_X      35  
+#define ROOM_MAX_Y      10
+#define ROOM_SEPARATION 6
 
 /*
  * Structure:   cell
  * ---------------------
  * the cell contains a symbol that can be printed to the console,
- * a hardness rating, and a mutable flag
+ * and a mutable flag
  */
 typedef struct cell{
     char symbol;
-    int hardness;
     int mutable;
 } cell_t;
 
@@ -41,8 +40,8 @@ typedef struct room{
 /*
  * Structure:   dungeon
  * ---------------------
- * the dungeon structure contains a 160 x 96 array of cells and 
- * an array of 12 rooms
+ * the dungeon structure contains a grid of cells and 
+ * a list of rooms
  */
 typedef struct dungeon{
     int num_rooms;
@@ -85,7 +84,7 @@ int is_outermost_wall(int x, int y)
 {
     if (x == 0 || x == DUNGEON_X - 1 || y == 0 || y == DUNGEON_Y - 1)
     {
-        return 1;
+        return 0;
     }
     else
     {
@@ -102,7 +101,7 @@ int is_outermost_wall(int x, int y)
  *  dungeon: dungeon with rooms to check against
  *  test_room: room to compare with current dungeon rooms
  *
- *  returns: 1 if the rooms hausdorff distance is greater than 3 from all
+ *  returns: 0 if the rooms hausdorff distance is greater than 3 from all
  *           other rooms
  *           in the dungeon
  */
@@ -112,7 +111,7 @@ int passes_hausdorff(dungeon_t *dungeon, room_t *test_room)
 
     if (dungeon->num_rooms <= 0)
     {
-        return 1;
+        return 0;
     }
 
     for (i = 0; i < dungeon->num_rooms; i++)
@@ -134,7 +133,7 @@ int passes_hausdorff(dungeon_t *dungeon, room_t *test_room)
             }
         }
     }
-    return 1;
+    return 0;
 }
 
 /*
@@ -147,7 +146,7 @@ int passes_hausdorff(dungeon_t *dungeon, room_t *test_room)
  *  start_y: starting y coordinate of the room
  *  dungeon: dungeon that will contain the new room
  *
- *  returns: 1 if the room is added successfully, -1 otherwise
+ *  returns: 0 if the room is added successfully, -1 otherwise
  */
 int create_room(int start_x, int start_y, dungeon_t *dungeon)
 {
@@ -170,8 +169,8 @@ int create_room(int start_x, int start_y, dungeon_t *dungeon)
         return -1;
     }
 
-    if (is_outermost_wall(start_x, start_y) == 1 ||
-        is_outermost_wall(end_x, end_y) == 1)
+    if (is_outermost_wall(start_x, start_y) == 0 ||
+        is_outermost_wall(end_x, end_y) == 0)
     {
         return -1;
     }
@@ -198,7 +197,7 @@ int create_room(int start_x, int start_y, dungeon_t *dungeon)
     dungeon->rooms[dungeon->num_rooms] = test_room;
     dungeon->num_rooms++;
 
-    return 1;
+    return 0;
 }
 
 /*
@@ -289,7 +288,6 @@ void generate_dungeon()
         {
             dungeon.cell[x][y].symbol = '#';
             dungeon.cell[x][y].mutable = is_outermost_wall(x, y);
-            dungeon.cell[x][y].hardness = rand() % 7;
         }
     }
     
@@ -299,7 +297,7 @@ void generate_dungeon()
     {
         int start_x = rand() % DUNGEON_X;
         int start_y = rand() % DUNGEON_Y;
-        if (create_room(start_x, start_y, &dungeon) == 1)
+        if (create_room(start_x, start_y, &dungeon) == 0)
         {
             roomCount++;
         }
