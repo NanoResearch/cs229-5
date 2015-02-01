@@ -13,6 +13,8 @@
 #define ROOM_MAX_Y      10
 #define ROOM_SEPARATION 6
 
+#define rand_range(min, max) ((rand() % (((max) + 1) - (min))) + (min))
+
 /*
  * Structure:   cell
  * ---------------------
@@ -261,10 +263,10 @@ void create_corridors(dungeon_t *dungeon)
 
     for (i = 1; i < MIN_ROOMS; i++)
     {
-        room1X = dungeon->rooms[i - 1].start_x + (dungeon->rooms[i - 1].end_x - dungeon->rooms[i - 1].start_x) / 2;
-        room1Y = dungeon->rooms[i - 1].start_y + (dungeon->rooms[i - 1].end_y - dungeon->rooms[i - 1].start_y) / 2;
-        room2X = dungeon->rooms[i].start_x + (dungeon->rooms[i].end_x - dungeon->rooms[i].start_x) / 2;
-        room2Y = dungeon->rooms[i].start_y + (dungeon->rooms[i].end_y - dungeon->rooms[i].start_y) / 2;
+        room1X = rand_range(dungeon->rooms[i - 1].start_x, dungeon->rooms[i - 1].end_x);
+        room1Y = rand_range(dungeon->rooms[i - 1].start_y, dungeon->rooms[i - 1].end_y);
+        room2X = rand_range(dungeon->rooms[i].start_x, dungeon->rooms[i].end_x);
+        room2Y = rand_range(dungeon->rooms[i].start_y, dungeon->rooms[i].end_y);
         connect_points(dungeon, room1X, room1Y, room2X, room2Y);
     }
 }
