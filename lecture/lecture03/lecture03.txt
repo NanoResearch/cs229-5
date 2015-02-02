@@ -1,0 +1,65 @@
+Lecture 03, Jan 16 2015
+
+* Compiling and Makefiles (continued)
+** Last time talked about gcc switches -Wall, -Werror, -g, -ggdb, and -o
+** Makefiles (usually) do compiliation in stages, so before we talk about
+   Makefiles, let's finish our discussion on the stages of compilation.
+*** Preprocessing
+    Always runs befor the compiler
+    gcc -E or cpp
+*** Compilation
+    Converts the high-level language code to assembly
+    gcc -S
+*** Assembly
+    Converts assembly code to machine language (object code)
+    gcc -c
+*** Linking
+    gcc (no arguments)
+** A Makefile is a specification of how to compile a program
+*** Sometimes used for other things as well, like generating documentation,
+    so it's more correct to say that it's a specification of how to build a
+    set of targets
+*** Interpreted by 'make'
+*** Consists of a set of definitions (optional, but useful) and a set of
+    rules
+*** Make reads the definitions, interprets the rules, and uses them to
+    determine how to build or rebuild the targets
+*** Definitions:
+      NAME = value
+*** targets
+    Can be multiple lines each, form is (not indenting here, because
+    indentation matters in makefiles!):
+
+target: dependencies
+        command
+        another command...
+
+*** The whitespace before the commands in the rules are single tabs!  Must be
+    single tabs, or it won't work.
+*** Add your compiler switches in here, so that they're always there.
+*** Generating dependencies
+    gcc -MM
+    "gcc -MM *.c" will give you a list of all source file dependencies.  
+    You'll only need to supply build rules and dependencies for the 
+    final executable.
+* README for assignments
+  About 150 words or less
+  How you have (or have not) met the specification
+  Functions we should look at
+  Important changes to previous functionality* README for assignments
+  Dual purpose: To help you think about what you've developed in the context
+  of the specification, and to help the graders quickly understand what to
+  look at to evaluate your work.
+  Should include names and locations of important functions and data structures.
+  Should include discussion on what you have done to meet the specification.
+  If you have failed to meet the specification in any way, it should explicitly
+  say that, as well.
+* CHANGELOG for assignments
+  Running list of your work and changes throughout the term.  No length limit.
+  Think of it as a "diary" of what you have done on your project.  Update it
+  every time you work with a timestamp and what you changed.  If you discover
+  a bug, document it here, even if you haven't fixed it yet.
+
+* Representing arrays (next lecture)
+** We've seen and used (are using) arrays.  How are they represented
+   internally, and what does that mean for us as programmers?

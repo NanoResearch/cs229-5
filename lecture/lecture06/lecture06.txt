@@ -1,0 +1,109 @@
+Lecture 06, Jan 26 2015
+
+* A little more on malloc()
+** When should we use malloc()?
+   When we don't statically know how much storage we need.
+   Ask yourself: Can I allocate this statically?  If you know how big it has
+   to be, the answer is yes, and so you shouldn't use dynamic allocation.
+   Exception: You know a maximum possible size, but that maximum is much 
+   larger than the expected size.  In that case, dynamic allocation is 
+   probably the better choice.
+** malloc() can fail
+   returns NULL; you need to check for it.  If you're an application
+   developer, you're best option is probably to terminate (gracefully).  If
+   you're a library developer, you return an error and allow your user to
+   decide what to do about it.
+** malloc() has some unnecessary but useful siblings
+*** calloc()
+    allocates arrays
+    Initializaes the returned storage to zero
+    If we use calloc() to allocate our queue_nodes in queue.c, then we don't
+    need to set next to NULL; calloc() does it for us.
+    Useful for debugging, since you can clearly see what data you have
+    modified, but the overhead is not necessarily a good thing, especially
+    in performance critical code.
+*** realloc()
+    reallocate memory
+    takes a pointer to storage previously returned by malloc()
+    Reallocates it to the new size.
+    Pointer returned may point to a new location
+    Output is truncated if new size is smaller
+    Dynamically resizable array example:
+    size_t array_size;
+    int size
+    int *array;
+    size = 0;
+    array_size = 16;
+    array = malloc(array_size * sizeof (*array));
+    /* fill up the array... */
+    if (size == array_size) {
+      /* Remember to test it! */
+      array = realloc(array, array_size *= 2);
+    }
+** It is an error--and one that corrupts program state!--to call free() on an
+   address which has not been malloc()ed.
+   Double-free bug
+   causes the program to fail in wierd ways
+   very difficult to debug
+* GDB
+** Queue code with errors from class is attached on BB.  Use it to practice
+   debugging.
+** Compile your program with -g to add debugging symbols
+   -ggdb adds even more symbols
+** Starting gdb and emacs gud-gdb mode
+   on command line: gdb <program name> 
+   In emacs: M-x gud-gdb
+   In emacs 22 or older: M-x gdb
+   'M-x gdb' works on later version of emacs, too, but it has changed in ways
+   that I don't understand, while 'M-x gud-gdb' invokes the old, pre-emacs 23
+   behavior.
+** Demonstrate above concepts and introduce basic GDB functionality
+*** run
+    Runs the program
+*** backtrace (bt)
+    prints the stack trace (all stack frames)
+*** up
+    Move up the stack (toward main())
+*** down
+    Moves down (away from main())
+*** break
+    Set a breakpoint
+    takes a function name, a line number, or a file:line number, or an address
+*** (s)tep
+    Step into a function call
+*** (n)ext
+    step over a function call
+*** print
+    print a variable
+    'set print pretty' gives nicer output
+*** list
+    list code around the current line
+    Not particularly useful in emacs, but necessary in the shell.
+*** (c)ontinue
+    Continue execution
+*** clear
+    delete a breakpoint
+*** delete
+    delete all breakpoints
+* Debugging memory errors
+** Electric Fence
+   Makes program instantly crash on memory error
+   Code is hard to find.  No longer on authors web site.  I'll post on BB.
+   Build it by typing make, then copy libefence.a into your project.  Link it
+   in by adding it to the link line (the line where you turn all the .o
+   files into an executable) in your makefile and also adding -lpthread 
+   (another library that efence depends on).  So if you have two source
+   files, say main.c and dungeon.c, which compile to main.o and dungeon.o,
+   your linking rule becomes:
+        gcc libefence.a main.c dungeon.o -lpthread -o dungeon
+** Valgrind
+   Runs your program and analyizes it for certain types of errors, including
+   uninitialized use bugs and memory leaks.  Run it with:
+        valgrind <program>
+   It will run a small, default set of tests.  If it detects any issues, it
+   will suggest other switches for you to use to run it again.  *That* run
+   may, in turn, suggest still more switches.
+   There is a graphical front-end called Valkyrie, which is not installed 
+   on pyrite.  You can get it and build it yourself, but be warned that,
+   in my experience, it doesn't build out-of-the-box, so you'll have to edit
+   the sources to fix the errors.

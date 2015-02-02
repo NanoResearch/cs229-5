@@ -1,0 +1,78 @@
+Lecture 04, Jan 21 2015
+
+* Final items for assignment submission
+** "Tarballs"
+   Let <dir> be the name of the directory you want to package.  Build a
+   tarball with the command:
+     tar cvfz <dir>.tar.gz <dir>
+   and expand a corresponding archive with
+     gzip -dc <dir>.tar.gz | tar xvf -
+   '|' is a pipe.  It tells the shell to take the output of the first 
+   command and write it to the input of the second.  When tar's main 
+   argument is '-', it reads from standard input.
+** File transfer to and from pyrite
+   scp / pscp
+   Both of these command line tools use the same syntax.  The only difference
+   is there name.  These are utilities that copy files, just like 'cp',
+   except that arguments may be remote, with a remove file being specified:
+     <username>@<host>:<file>
+   Copy the file with
+     scp <from> <to>
+   or use pscp.  So to copy a file, say tour.c, from my local machine to
+   *pyrite, I'd issue the command:
+     scp tour.c sheaffer@pyrite.cs.iastate.edu:.
+* Needed for assignment 1.01
+** rand(), srand(), time()
+** int rand(void)
+   #include <stdlib.h>
+   returns a random number less than RAND_MAX (2^31 - 1)
+** void srand(unsigned int seed)
+   Seeds  the random number generator
+   only seed it once, usually at initialization time
+** time_t time(time_t *t)
+   #include <time.h>
+   srand(time(NULL));
+* Representing arrays
+** How do we declare an array?
+   int array[8];
+** What does that declaration mean?
+   The compiler allocates a block of contiguous storage large enough for 
+   8 integers
+** How is the array laid out in memory?
+   Contiguously.
+   If we allocate a multi-dimensional array, it's still laid out
+   contiguously.  Consider a two dimensional array of ints:
+     int matrix[4][4]
+   This allocates 4 * 4 * sizeof (int) bytes.  On most machines,
+   sizeof (int) will be 4 (the standard requires only that it is at least
+   4).  So 64 contiguous bytes.  We can access the third row, second column 
+   with
+     matrix[2][1]
+   (remember, we're zero indexed!).  What's the address of that index?
+     matrix + (2 * 4) + 1
+   where the 1 and the 2 are just as in the array notation, and the 4 is the 
+   number of columns.
+* Pointers
+  Declare a new pointer variable by using a '*' in the declaration.  So 
+  a pointer, p, to an int is declared:
+    int *p;
+** Address and dereference operators, and the Relationship between
+   pointers and arrays
+
+   An array name corresponds with the address of the array, so an array can
+   be assigned to a pointer, so
+     p = array;
+   is legal code, and we can access the elements of array by indexing p, 
+   just as we do by indexing array, so for all i,
+     p[i] == array[i]
+   Suppose we have an int j.  We can also point p at j by taking j's address
+   and assigning it to p:
+     p = &j;
+   '&' is the address operator.  We can use the dereference operator, '*',
+   to access the information stored at that address:
+     *p == j
+   And remember how we found an address associated with an array index?  We
+   can dereference that address to get the value stored there:
+     p = matrix;
+     *(p + (2 * 4) + 1) == matrix[2][1]
+* We barely touched GDB.  More on that next time.

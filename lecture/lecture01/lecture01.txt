@@ -1,0 +1,51 @@
+Lecture 01, Jan 12 2015
+Syllabus, Quick UNIX primer, Hello World
+
+* Syllabus
+  We have one.  It's kind of long.  Read it.  In particular, if you read
+  nothing else, please read the sections on course work, late policy, and
+  integrity.
+* Pyrite
+  pyrite.cs.iastate.edu: server that you can work on.  Connect to it with ssh.
+** ssh
+   Use ssh to connect to pyrite: ssh pyrite
+   Or use SecureCRT in windows (there are other clients, too)
+** SecureCRT
+   A popular ssh client for windows
+   Installing Cygwin will also supply the command line ssh utility, as well
+   as all other software used in this class.
+* Useful commands
+** man
+   manual pages
+   type "man <command>", for example "man man" will give you the
+   documentation for man itself.  'q' will quit
+** pwd
+   Present (print) working direcetory
+** ls
+   list a directorry
+** cd
+   Change Directory
+** cp
+   Copy
+** mv
+   Move
+** rm
+   Remove
+** cat
+   Concatenate - sticks files together.  If a single file, spew it to
+   terminal (i.e., concatenate it with standard output)
+** less
+   Pager -- allows you to page a file, scroll up and down, q to quit
+* Hello World: Java vs. C
+  Files are attached.
+  To compile and run java program:
+    javac hello.java
+    java hello
+  To compile and run C program:
+    gcc hello.c
+    ./a.out
+  Or
+    gcc hello.c -o hello
+    ./hello
+* Compiling and Makefiles
+  Next time.

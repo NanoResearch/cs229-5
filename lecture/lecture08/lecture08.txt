@@ -1,0 +1,91 @@
+Lecture 08, Jan 30 2015
+
+* Finish file I/O Example from Lecture 7; add getenv(3) and path construction
+** char *getenv(const char *name);
+   All of the defined environment variables are already mapped into your
+   program's address space.  getenv() simply maps a name to a value and 
+   returns the address of that value.  The storage associate with it is
+   statically allocated, so you don't need to free() it.
+* More on types; the few that we haven't explicitly covered
+** enums
+   Define a list of constant integers
+   enum <name> {
+     element1,
+     element2,
+     ...
+  };
+  typedef it, just like a struct
+  Each element* in the above definition has an integer value.  The first one
+  has the value 0, then 1, then 2...
+  You can assign one of the, like this:
+  enum <name> {
+    element1,
+    element2 = 5,
+    element3,
+    ...
+  };
+  in which case, element1 is still 0, but element2 is 5 and the counting
+  continues from there.  You can even make more than one assignment.
+** unions
+   A data structure in which all members overlap
+   union <name> {
+     int i;
+     float f;
+   };
+   You can use i or f, not both
+   accessed same as with a struct
+   Both the i and f fields have the same address.  i and f use the same
+   storage.
+   See endianness.c for an example that uses that *and* demonstrates
+   endianness conversions
+** void
+   Has no type
+   Functions can return void (no return value), or take void arguments
+   (no arguments)
+** void *
+   Points to anything
+   cannot be dereferenced
+   A generic pointer
+* Hexadecimal
+  Like decimal, but there are 16 digits
+  place values multiply by powers of 16
+  0-f, a==10, b=11, c==12, d==13, e==14, f==15
+
+  Decimal   Hexadecimal   Binary
+  0         0             0
+  1         1             0001
+  2         2             0010
+  3         3             0011
+  4         4             0100
+  5         5             0101
+  6         6             0110
+  7         7             0111
+  8         8             1000
+  9         9             1001
+  10        a or A        1010
+  11        b or B        1011
+  12        c or C        1100
+  13        d or D        1101
+  14        e or E        1110
+  15        f or F        1111
+
+* Endianness
+  Some computers are designed so that values are stored most-significant-
+  byte first, and some are least-significant-byte first.  The former are
+  big-endian, and the latter are little-endian.
+  These names are an homage to Swift's Gulliver's Travels in which there
+  is an island of warring people whose fight is about which end of an egg
+  should be broken.
+  There are arguments for both sides (computing, not eggs; in the latter,
+  of course you open the big end!), but none are convincing, and today,
+  essentially everybody agrees that it doesn't matter.  The ideal situation
+  would be that all systems use the same endianness, but it's been too late
+  for that for a very long time.  As a result, if we want to transfer data
+  between two machines that (may) differ in endianness, we need to convert
+  data to an agreed-upon format and then convert it back on the other end.
+  The agreed-upon format is big endian.
+** endian(3) has a bunch of functions
+   In the names, the numbers are the number of bits in the values,
+   h means host, be is big enduin, and le is little endian.
+** See endian.h for examples that use these functions
+* Next lecture, representing primitive types (ints, floats, etc.)
