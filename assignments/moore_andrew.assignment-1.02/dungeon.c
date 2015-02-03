@@ -418,6 +418,8 @@ void load_dungeon(dungeon_t *d)
 int main(int argc, char *argv[])
 {
   dungeon_t d;
+  
+  srand(time(NULL));
 
   if (argc == 1)
   {
