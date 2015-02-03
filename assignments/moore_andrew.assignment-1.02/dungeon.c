@@ -438,8 +438,8 @@ int save_dungeon(dungeon_t *d)
    * An unsigned 32-bit integer size of the rest of the file (total size of the file minus
    * 14)
    */
-  unsigned int size_of_rest = 61455 + (MAX_ROOMS * 4) - 14;
   size_of_rest = htobe32(size_of_rest);
+  unsigned int size_of_rest = 61455 + (d->num_rooms * 4) - 14;
   fwrite(&size_of_rest, 4, 1, f);
 
   /*
