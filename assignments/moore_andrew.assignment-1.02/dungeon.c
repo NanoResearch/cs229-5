@@ -416,5 +416,53 @@ void load_dungeon(dungeon_t *d)
  * Author: Andrew Moore
  */
 int main(int argc, char *argv[])
-{  return 0;
+{
+  dungeon_t d;
+
+  if (argc == 1)
+  {
+    // generate a new dungeon, render it, and exit
+    printf("generate a new dungeon, render it, and exit\n");
+    gen_dungeon(&d);
+    render_dungeon(&d);
+    return 0;
+  }
+  if (argc == 2)
+  {
+    if (!strcmp(argv[1], "--save"))
+    {
+      // generate a new dungeon, render it, save it, and exit
+      printf("generate a new dungeon, render it, save it, and exit\n");
+      gen_dungeon(&d);
+      render_dungeon(&d);
+      save_dungeon(&d);
+      return 0;
+    }
+    if (!strcmp(argv[1], "--load"))
+    {
+      // load the dungeon from disk, render it, and exit
+      printf("load the dungeon from disk, render it, and exit\n");
+      load_dungeon(&d);
+      render_dungeon(&d);
+      return 0;
+    }
+  }
+  if (argc == 3)
+  {
+    if ((!strcmp(argv[1], "--save") && !strcmp(argv[2], "--load")) ||
+        (!strcmp(argv[1], "--load") && !strcmp(argv[2], "--save")))
+    {
+      // load the dungeon from disk, render it, save it, and exit
+      printf("load the dungeon from disk, render it, rewrite it, and exit\n");
+      load_dungeon(&d);
+      render_dungeon(&d);
+      save_dungeon(&d);
+      return 0;
+    }
+  }
+  
+  // there were no valid arguments
+  fprintf(stderr, "Bad argument format\n '--save' and '--load' are valid arguments\n");
+
+  return 0;
 }
