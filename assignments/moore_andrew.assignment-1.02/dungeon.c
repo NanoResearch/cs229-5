@@ -398,18 +398,165 @@ void render_dungeon(dungeon_t *d)
 /*
  * Author: Andrew Moore
  */
-void save_dungeon(dungeon_t *d)
+int save_dungeon(dungeon_t *d)
 {
+  FILE *f;
+  char *path; // Absolute path to the save file
+  char *home; // The name of home directory
+  char *path_to_file; // The path inside home to the save file
+
   printf("saving dungeon...\n");
+
+  home = getenv("HOME"); 
+  path_to_file = ".rlg229/dungeon";
+
+  path = malloc(strlen(home) + strlen(path_to_file) + 2 /* NULL and internal / */);
+  if (!path)
+  {
+    fprintf(stderr, "malloc failed!\n");
+    return 1;
+  }
+
+  sprintf(path, "%s/%s", home, path_to_file);
+
+  f = fopen(path, "w");
+
+  /*
+   * A semantic file-type marker with the value RLG229
+   */
+   char file_marker[] = "RLG229";
+   fwrite(&file_marker, 1, 6, f);
+
+  /*
+   * An unsigned 32-bit integer file version marker with the value 0
+   */
+  uint32_t version_marker = 6;
+  version_marker = htobe32(version_marker);
+  fwrite(&version_marker, 4, 1, f);
+
+  /*
+   * An unsigned 32-bit integer size of the rest of the file (total size of the file minus
+   * 14)
+   */
+  unsigned int size_of_rest = 61455 + (MAX_ROOMS * 4) - 14;
+  size_of_rest = htobe32(size_of_rest);
+  fwrite(&size_of_rest, 4, 1, f);
+
+  /*
+   * The row-major dungeon matrix from top to bottom, with four bytes for each cell. In
+   * each cell, the first byte is non-zero if the cell represents open space, zero otherwise;
+   * the second byte is non-zero if the cell is part of a room, zero otherwise; the third
+   * byte is non-zero if the cell is part of a corridor, zero otherwise; and the fourth byte
+   * is the unsigned, 8-bit integer hardness value of the cell, where open space has a
+   * hardness of 0 and immutable material has a hardness of 255.
+   */
+
+  /*
+   * An unsigned 16-bit integer containing the number of rooms in the dungeon
+   */
+  uint16_t number_of_rooms = d->num_rooms;
+  printf("room count: %d\n", d->num_rooms);
+  number_of_rooms = htobe16(number_of_rooms);
+  fwrite(&number_of_rooms, 2, 1, f);
+  
+  /*
+   * The positions of all of the rooms in the dungeon, given with 4 unsigned 8-bit integers
+   * each. The first byte is the x position of the upper left corner of the room; the second
+   * byte is the y position of the upper left corner of the room; the third byte is the width
+   * of the room; and the fourth byte is the height of the room.
+   */
+
+
+  fclose(f);
+
+  return 0;
 }
 
 /*
  * Author: Andrew Moore
  */
-void load_dungeon(dungeon_t *d)
+int load_dungeon(dungeon_t *d)
 {
+  int i;
+  FILE *f;
+  char *path; // Absolute path to the save file
+  char *home; // The name of home directory
+  char *path_to_file; // The path inside home to the save file
+
   printf("loading dungeon...\n");
-  gen_dungeon(d);
+
+  home = getenv("HOME"); 
+  path_to_file = ".rlg229/dungeon";
+
+  path = malloc(strlen(home) + strlen(path_to_file) + 2 /* NULL and internal / */);
+  if (!path)
+  {
+    fprintf(stderr, "malloc failed!\n");
+    return 1;
+  }
+
+  sprintf(path, "%s/%s", home, path_to_file);
+  f = fopen(path, "r");
+
+  /*
+   * A semantic file-type marker with the value RLG229
+   */
+  char *file_marker;
+  file_marker = malloc(7);
+
+  for (i = 0; i < 6; i++)
+  {
+    fread(&file_marker[i], 1, 1, f);
+  }
+  file_marker[6] = '\0';
+
+  printf("file-type: %s\n", file_marker);
+
+  /*
+   * An unsigned 32-bit integer file version marker with the value 0
+   */
+  uint32_t version_marker;
+  fread(&version_marker, 4, 1, f);
+  version_marker = be32toh(version_marker);
+  printf("version number: %d\n", version_marker);
+
+  /*
+   * An unsigned 32-bit integer size of the rest of the file (total size of the file minus
+   * 14)
+   */
+  uint32_t size_of_rest;
+  fread(&size_of_rest, 4, 1, f);
+  size_of_rest = be32toh(size_of_rest);
+  printf("file Size: %d bytes\n", size_of_rest + 14);
+  
+  /*
+   * The row-major dungeon matrix from top to bottom, with four bytes for each cell. In
+   * each cell, the first byte is non-zero if the cell represents open space, zero otherwise;
+   * the second byte is non-zero if the cell is part of a room, zero otherwise; the third
+   * byte is non-zero if the cell is part of a corridor, zero otherwise; and the fourth byte
+   * is the unsigned, 8-bit integer hardness value of the cell, where open space has a
+   * hardness of 0 and immutable material has a hardness of 255.
+   */
+
+  /*
+   * An unsigned 16-bit integer containing the number of rooms in the dungeon
+   */
+   uint16_t number_of_rooms;
+   fread(&number_of_rooms, 2, 1, f);
+   number_of_rooms =  be16toh(number_of_rooms);
+   d->num_rooms = number_of_rooms;
+   printf("number of rooms: %d\n", number_of_rooms);
+
+  /*
+   * The positions of all of the rooms in the dungeon, given with 4 unsigned 8-bit integers
+   * each. The first byte is the x position of the upper left corner of the room; the second
+   * byte is the y position of the upper left corner of the room; the third byte is the width
+   * of the room; and the fourth byte is the height of the room.
+   */
+
+
+  gen_dungeon(d); //delete when done
+  return 0;
 }
 
 /*
@@ -418,53 +565,53 @@ void load_dungeon(dungeon_t *d)
 int main(int argc, char *argv[])
 {
   dungeon_t d;
-  
+
   srand(time(NULL));
 
-  if (argc == 1)
-  {
-    // generate a new dungeon, render it, and exit
-    printf("generate a new dungeon, render it, and exit\n");
-    gen_dungeon(&d);
-    render_dungeon(&d);
-    return 0;
-  }
-  if (argc == 2)
-  {
-    if (!strcmp(argv[1], "--save"))
-    {
+  // if (argc == 1)
+  // {
+  //   // generate a new dungeon, render it, and exit
+  //   printf("generate a new dungeon, render it, and exit\n");
+  //   gen_dungeon(&d);
+  //   render_dungeon(&d);
+  //   return 0;
+  // }
+  // if (argc == 2)
+  // {
+  //   if (!strcmp(argv[1], "--save"))
+  //   {
       // generate a new dungeon, render it, save it, and exit
       printf("generate a new dungeon, render it, save it, and exit\n");
       gen_dungeon(&d);
       render_dungeon(&d);
       save_dungeon(&d);
-      return 0;
-    }
-    if (!strcmp(argv[1], "--load"))
-    {
-      // load the dungeon from disk, render it, and exit
-      printf("load the dungeon from disk, render it, and exit\n");
+  //     return 0;
+  //   }
+  //   if (!strcmp(argv[1], "--load"))
+  //   {
+  //     // load the dungeon from disk, render it, and exit
+  //     printf("load the dungeon from disk, render it, and exit\n");
       load_dungeon(&d);
-      render_dungeon(&d);
-      return 0;
-    }
-  }
-  if (argc == 3)
-  {
-    if ((!strcmp(argv[1], "--save") && !strcmp(argv[2], "--load")) ||
-        (!strcmp(argv[1], "--load") && !strcmp(argv[2], "--save")))
-    {
-      // load the dungeon from disk, render it, save it, and exit
-      printf("load the dungeon from disk, render it, rewrite it, and exit\n");
-      load_dungeon(&d);
-      render_dungeon(&d);
-      save_dungeon(&d);
-      return 0;
-    }
-  }
+  //     render_dungeon(&d);
+  //     return 0;
+  //   }
+  // }
+  // if (argc == 3)
+  // {
+  //   if ((!strcmp(argv[1], "--save") && !strcmp(argv[2], "--load")) ||
+  //       (!strcmp(argv[1], "--load") && !strcmp(argv[2], "--save")))
+  //   {
+  //     // load the dungeon from disk, render it, save it, and exit
+  //     printf("load the dungeon from disk, render it, rewrite it, and exit\n");
+  //     load_dungeon(&d);
+  //     render_dungeon(&d);
+  //     save_dungeon(&d);
+  //     return 0;
+  //   }
+  // }
   
-  // there were no valid arguments
-  fprintf(stderr, "Bad argument format\n '--save' and '--load' are valid arguments\n");
+  // // there were no valid arguments
+  // fprintf(stderr, "Bad argument format\n '--save' and '--load' are valid arguments\n");
 
   return 0;
 }
