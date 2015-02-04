@@ -400,7 +400,6 @@ void render_dungeon(dungeon_t *d)
  */
 int save_dungeon(dungeon_t *d)
 {
-  int x, y;
   FILE *f;
   char *path; // Absolute path to the save file
   char *home; // The name of home directory
@@ -488,7 +487,6 @@ int save_dungeon(dungeon_t *d)
 
   // Position, width and height of all the rooms
   int i;
-  uint8_t x_pos, y_pos, width, height;
 
   for (i = 0; i < d->num_rooms; i++)
   {
