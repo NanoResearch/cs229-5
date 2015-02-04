@@ -400,6 +400,7 @@ void render_dungeon(dungeon_t *d)
  */
 int save_dungeon(dungeon_t *d)
 {
+  int x, y;
   FILE *f;
   char *path; // Absolute path to the save file
   char *home; // The name of home directory
@@ -421,54 +422,83 @@ int save_dungeon(dungeon_t *d)
 
   f = fopen(path, "w");
 
-  /*
-   * A semantic file-type marker with the value RLG229
-   */
-   char file_marker[] = "RLG229";
-   fwrite(&file_marker, 1, 6, f);
 
-  /*
-   * An unsigned 32-bit integer file version marker with the value 0
-   */
-  uint32_t version_marker = 6;
+  // file-type marker with the value RLG229
+  char file_marker[] = "RLG229";
+  fwrite(&file_marker, 1, 6, f);
+
+
+  // An unsigned 32-bit integer file version marker with the value 0
+  uint32_t version_marker = 0;
   version_marker = htobe32(version_marker);
   fwrite(&version_marker, 4, 1, f);
 
-  /*
-   * An unsigned 32-bit integer size of the rest of the file (total size of the file minus
-   * 14)
-   */
+
+  // An unsigned 32-bit integer size of the rest of the file
   unsigned int size_of_rest = 61455 + (d->num_rooms * 4) - 14;
   size_of_rest = htobe32(size_of_rest);
   fwrite(&size_of_rest, 4, 1, f);
 
-  /*
-   * The row-major dungeon matrix from top to bottom, with four bytes for each cell. In
-   * each cell, the first byte is non-zero if the cell represents open space, zero otherwise;
-   * the second byte is non-zero if the cell is part of a room, zero otherwise; the third
-   * byte is non-zero if the cell is part of a corridor, zero otherwise; and the fourth byte
-   * is the unsigned, 8-bit integer hardness value of the cell, where open space has a
-   * hardness of 0 and immutable material has a hardness of 255.
-   */
 
-  /*
-   * An unsigned 16-bit integer containing the number of rooms in the dungeon
-   */
+  // terrain values for the map
+  pair_t p;
+  uint8_t open, room, corridor, hardness;
+  
+  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
+    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
+      switch (d->map[p[dim_y]][p[dim_x]]) {
+      case ter_wall_immutable:
+        open = 0;
+        room = 0;
+        corridor = 0;
+        hardness = 255;
+        break;
+      case ter_wall:
+        open = 0;
+        room = 0;
+        corridor = 0;
+        hardness = rand_range(1, 154);
+        break;
+      case ter_floor_room:
+        open = 1;
+        room = 1;
+        corridor = 0;
+        hardness = 0;
+        break;
+      case ter_floor_hall:
+        open = 1;
+        room = 0;
+        corridor = 1;
+        hardness = 0;
+        break;
+      }
+      fwrite(&open, 1, 1, f);
+      fwrite(&room, 1, 1, f);
+      fwrite(&corridor, 1, 1, f);
+      fwrite(&hardness, 1, 1, f);
+    }
+  }
+
+
+  // An unsigned 16-bit integer containing the number of rooms in the dungeon
   uint16_t number_of_rooms = d->num_rooms;
-  printf("room count: %d\n", d->num_rooms);
   number_of_rooms = htobe16(number_of_rooms);
   fwrite(&number_of_rooms, 2, 1, f);
   
-  /*
-   * The positions of all of the rooms in the dungeon, given with 4 unsigned 8-bit integers
-   * each. The first byte is the x position of the upper left corner of the room; the second
-   * byte is the y position of the upper left corner of the room; the third byte is the width
-   * of the room; and the fourth byte is the height of the room.
-   */
 
+  // Position, width and height of all the rooms
+  int i;
+  uint8_t x_pos, y_pos, width, height;
+
+  for (i = 0; i < d->num_rooms; i++)
+  {
+    fwrite(&d->rooms[i].position[dim_x], 4, 1, f);
+    fwrite(&d->rooms[i].position[dim_y], 4, 1, f);
+    fwrite(&d->rooms[i].size[dim_x], 4, 1, f);
+    fwrite(&d->rooms[i].size[dim_y], 4, 1, f);
+  }
 
   fclose(f);
-
   return 0;
 }
 
@@ -498,9 +528,8 @@ int load_dungeon(dungeon_t *d)
   sprintf(path, "%s/%s", home, path_to_file);
   f = fopen(path, "r");
 
-  /*
-   * A semantic file-type marker with the value RLG229
-   */
+
+  // file-type marker with the value RLG229
   char *file_marker;
   file_marker = malloc(7);
 
@@ -512,50 +541,68 @@ int load_dungeon(dungeon_t *d)
 
   printf("file-type: %s\n", file_marker);
 
-  /*
-   * An unsigned 32-bit integer file version marker with the value 0
-   */
+
+  // An unsigned 32-bit integer file version marker with the value 0
   uint32_t version_marker;
   fread(&version_marker, 4, 1, f);
   version_marker = be32toh(version_marker);
   printf("version number: %d\n", version_marker);
 
-  /*
-   * An unsigned 32-bit integer size of the rest of the file (total size of the file minus
-   * 14)
-   */
+
+  // An unsigned 32-bit integer size of the rest of the file
   uint32_t size_of_rest;
   fread(&size_of_rest, 4, 1, f);
   size_of_rest = be32toh(size_of_rest);
   printf("file Size: %d bytes\n", size_of_rest + 14);
   
-  /*
-   * The row-major dungeon matrix from top to bottom, with four bytes for each cell. In
-   * each cell, the first byte is non-zero if the cell represents open space, zero otherwise;
-   * the second byte is non-zero if the cell is part of a room, zero otherwise; the third
-   * byte is non-zero if the cell is part of a corridor, zero otherwise; and the fourth byte
-   * is the unsigned, 8-bit integer hardness value of the cell, where open space has a
-   * hardness of 0 and immutable material has a hardness of 255.
-   */
 
-  /*
-   * An unsigned 16-bit integer containing the number of rooms in the dungeon
-   */
-   uint16_t number_of_rooms;
-   fread(&number_of_rooms, 2, 1, f);
-   number_of_rooms =  be16toh(number_of_rooms);
-   d->num_rooms = number_of_rooms;
-   printf("number of rooms: %d\n", number_of_rooms);
+  // terrain values for the map
+  pair_t p;
+  uint8_t open, room, corridor, hardness;
+  
+  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
+    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
+      fread(&open, 1, 1, f);
+      fread(&room, 1, 1, f);
+      fread(&corridor, 1, 1, f);
+      fread(&hardness, 1, 1, f);
+      
+      if (hardness == 255)
+      {
+        d->map[p[dim_y]][p[dim_x]] = ter_wall_immutable;
+      }
+      else if (room != 0)
+      {
+        d->map[p[dim_y]][p[dim_x]] = ter_floor_room;
+      }
+      else if (corridor != 0)
+      {
+        d->map[p[dim_y]][p[dim_x]] = ter_floor_hall;
+      }
+      else
+      {
+        d->map[p[dim_y]][p[dim_x]] = ter_wall;
+      }
+    }
+  }
 
-  /*
-   * The positions of all of the rooms in the dungeon, given with 4 unsigned 8-bit integers
-   * each. The first byte is the x position of the upper left corner of the room; the second
-   * byte is the y position of the upper left corner of the room; the third byte is the width
-   * of the room; and the fourth byte is the height of the room.
-   */
+
+  // An unsigned 16-bit integer containing the number of rooms in the dungeon
+  uint16_t number_of_rooms;
+  fread(&number_of_rooms, 2, 1, f);
+  number_of_rooms =  be16toh(number_of_rooms);
+  d->num_rooms = number_of_rooms;
 
 
-  gen_dungeon(d); //delete when done
+  // Position, width and height of all the rooms
+  for (i = 0; i < d->num_rooms; i++)
+  {
+    fread(&d->rooms[i].position[dim_x], 4, 1, f);
+    fread(&d->rooms[i].position[dim_y], 4, 1, f);
+    fread(&d->rooms[i].size[dim_x], 4, 1, f);
+    fread(&d->rooms[i].size[dim_y], 4, 1, f);
+  }
+
   return 0;
 }
 
@@ -568,50 +615,46 @@ int main(int argc, char *argv[])
 
   srand(time(NULL));
 
-  // if (argc == 1)
-  // {
-  //   // generate a new dungeon, render it, and exit
-  //   printf("generate a new dungeon, render it, and exit\n");
-  //   gen_dungeon(&d);
-  //   render_dungeon(&d);
-  //   return 0;
-  // }
-  // if (argc == 2)
-  // {
-  //   if (!strcmp(argv[1], "--save"))
-  //   {
+  if (argc == 1)
+  {
+    // generate a new dungeon, render it, and exit
+    gen_dungeon(&d);
+    render_dungeon(&d);
+    return 0;
+  }
+  if (argc == 2)
+  {
+    if (!strcmp(argv[1], "--save"))
+    {
       // generate a new dungeon, render it, save it, and exit
-      printf("generate a new dungeon, render it, save it, and exit\n");
       gen_dungeon(&d);
       render_dungeon(&d);
       save_dungeon(&d);
-  //     return 0;
-  //   }
-  //   if (!strcmp(argv[1], "--load"))
-  //   {
-  //     // load the dungeon from disk, render it, and exit
-  //     printf("load the dungeon from disk, render it, and exit\n");
+      return 0;
+    }
+    if (!strcmp(argv[1], "--load"))
+    {
+      // load the dungeon from disk, render it, and exit
       load_dungeon(&d);
-  //     render_dungeon(&d);
-  //     return 0;
-  //   }
-  // }
-  // if (argc == 3)
-  // {
-  //   if ((!strcmp(argv[1], "--save") && !strcmp(argv[2], "--load")) ||
-  //       (!strcmp(argv[1], "--load") && !strcmp(argv[2], "--save")))
-  //   {
-  //     // load the dungeon from disk, render it, save it, and exit
-  //     printf("load the dungeon from disk, render it, rewrite it, and exit\n");
-  //     load_dungeon(&d);
-  //     render_dungeon(&d);
-  //     save_dungeon(&d);
-  //     return 0;
-  //   }
-  // }
+      render_dungeon(&d);
+      return 0;
+    }
+  }
+  if (argc == 3)
+  {
+    if ((!strcmp(argv[1], "--save") && !strcmp(argv[2], "--load")) ||
+        (!strcmp(argv[1], "--load") && !strcmp(argv[2], "--save")))
+    {
+      // load the dungeon from disk, render it, save it, and exit
+      load_dungeon(&d);
+      render_dungeon(&d);
+      save_dungeon(&d);
+      return 0;
+    }
+  }
   
-  // // there were no valid arguments
-  // fprintf(stderr, "Bad argument format\n '--save' and '--load' are valid arguments\n");
+  // there were no valid arguments
+  fprintf(stderr, "Bad argument format\n '--save' and/or '--load' are valid arguments\n");
 
   return 0;
 }
