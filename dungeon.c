@@ -331,13 +331,13 @@ int save_dungeon(dungeon_t *d)
 
   // An unsigned 32-bit integer file version marker with the value 0
   uint32_t version_marker = 0;
-  // version_marker = htobe32(version_marker);
+  version_marker = htobe32(version_marker);
   fwrite(&version_marker, 4, 1, f);
 
 
   // An unsigned 32-bit integer size of the rest of the file
   unsigned int size_of_rest = 61455 + (d->num_rooms * 4) - 14;
-  // size_of_rest = htobe32(size_of_rest);
+  size_of_rest = htobe32(size_of_rest);
   fwrite(&size_of_rest, 4, 1, f);
 
 
@@ -381,7 +381,7 @@ int save_dungeon(dungeon_t *d)
 
   // An unsigned 16-bit integer containing the number of rooms in the dungeon
   uint16_t number_of_rooms = d->num_rooms;
-  // number_of_rooms = htobe16(number_of_rooms);
+  number_of_rooms = htobe16(number_of_rooms);
   fwrite(&number_of_rooms, 2, 1, f);
   
 
@@ -441,14 +441,14 @@ int load_dungeon(dungeon_t *d)
   // An unsigned 32-bit integer file version marker with the value 0
   uint32_t version_marker;
   fread(&version_marker, 4, 1, f);
-  // version_marker = be32toh(version_marker);
+  version_marker = be32toh(version_marker);
   printf("version number: %d\n", version_marker);
 
 
   // An unsigned 32-bit integer size of the rest of the file
   uint32_t size_of_rest;
   fread(&size_of_rest, 4, 1, f);
-  // size_of_rest = be32toh(size_of_rest);
+  size_of_rest = be32toh(size_of_rest);
   printf("file Size: %d bytes\n", size_of_rest + 14);
   
 
@@ -485,7 +485,7 @@ int load_dungeon(dungeon_t *d)
   // An unsigned 16-bit integer containing the number of rooms in the dungeon
   uint16_t number_of_rooms;
   fread(&number_of_rooms, 2, 1, f);
-  // number_of_rooms = be16toh(number_of_rooms);
+  number_of_rooms = be16toh(number_of_rooms);
   d->num_rooms = number_of_rooms;
 
 
