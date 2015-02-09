@@ -29,3 +29,24 @@ add simplest method to connect two points in the dungeon
 add ability to make very basic corridors
 use malloc on the whole dungeon instead of each cell
 update CHANGELOG
+
+1-31-15
+========
+setup skeleton for save and load functions
+command line arguments call correct functions
+
+2-1-15
+========
+testing endianess.. seems to be working
+finished the saves that require endianess conversion
+
+2-2-15
+========
+finished save for room data in the dungeon
+finished save for terrain of the dungeon
+
+2-3-15
+========
+cleaned up print statements
+tested to make sure everything is working
+update makefile, README, and CHANGELOG
