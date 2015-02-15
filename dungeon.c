@@ -51,6 +51,12 @@ typedef struct dungeon
   cell_t cells[DUNGEON_Y][DUNGEON_X];
 } dungeon_t;
 
+typedef struct path {
+  uint8_t pos[2];
+  uint8_t from[2];
+  uint16_t cost;
+} path_t;
+
 int empty_dungeon(dungeon_t *d)
 {
   int x, y;
