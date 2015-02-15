@@ -98,6 +98,27 @@ void priority_queue_add_with_priority(priority_queue_t *pq, path_t *path)
   priority_queue_perc_up(pq, i_child, i_parent);
 }
 
+void priority_queue_decrease_priority(priority_queue_t *pq, path_t *p, int cost)
+{
+  printf("decrease priority\n");
+  int i;
+
+  for (i = 0; i < pq->length; i++)
+  {
+    if (pq->path[i].pos[0] == p->pos[0] && pq->path[i].pos[1] == p->pos[1])
+    {
+      int i_child = i;
+      int i_parent = (i - 1) / 2;
+
+      pq->path[i].cost = cost;
+
+      priority_queue_perc_up(pq, i_child, i_parent);
+      return;
+    }
+  }
+  // error
+}
+
 int empty_dungeon(dungeon_t *d)
 {
   int x, y;
