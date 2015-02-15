@@ -63,6 +63,11 @@ typedef struct priority_queue
   path_t path[DUNGEON_X * DUNGEON_Y];
 } priority_queue_t;
 
+void priority_queue_init(priority_queue_t *pq)
+{
+  pq->length = 0;
+}
+
 int empty_dungeon(dungeon_t *d)
 {
   int x, y;
