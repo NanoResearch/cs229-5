@@ -119,6 +119,66 @@ void priority_queue_decrease_priority(priority_queue_t *pq, path_t *p, int cost)
   // error
 }
 
+void priority_queue_extract_min(priority_queue_t *pq, path_t *p)
+{
+  printf("extract min\n");
+  int i_parent = 0;
+  int i_left_child = 1;
+  int i_right_child = 2;
+  path_t temp_path;
+
+  *p = pq->path[0];
+  pq->path[0] = pq->path[pq->length - 1];
+
+  while (i_left_child < pq->length)
+  {
+    // left and right children
+    if (i_right_child < pq->length)
+    {
+      // left child is smallest
+      if(pq->path[i_left_child].cost < pq->path[i_parent].cost &&
+         pq->path[i_left_child].cost <= pq->path[i_right_child].cost)
+      {
+        temp_path = pq->path[i_parent];
+        pq->path[i_parent] = pq->path[i_left_child];
+        pq->path[i_left_child] = temp_path;
+
+        i_parent = i_right_child;
+        i_left_child = i_parent * 2 + 1;
+        i_right_child = i_parent * 2 + 2;
+      }
+      // right child is smallest
+      else if (pq->path[i_right_child].cost < pq->path[i_parent].cost &&
+               pq->path[i_right_child].cost <= pq->path[i_left_child].cost)
+      {
+        temp_path = pq->path[i_parent];
+        pq->path[i_parent] = pq->path[i_right_child];
+        pq->path[i_right_child] = temp_path;
+
+        i_parent = i_right_child;
+        i_left_child = i_parent * 2 + 1;
+        i_right_child = i_parent * 2 + 2;
+      }
+      else
+      {
+        return;
+      }
+    }
+    // no right child
+    else
+    {
+      if (pq->path[i_left_child].cost < pq->path[i_parent].cost)
+      {
+        temp_path = pq->path[i_parent];
+        pq->path[i_parent] = pq->path[i_left_child];
+        pq->path[i_left_child] = temp_path;
+      }
+      return;
+    }
+  }
+  pq->length--;
+}
+
 int empty_dungeon(dungeon_t *d)
 {
   int x, y;
