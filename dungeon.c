@@ -57,6 +57,12 @@ typedef struct path {
   uint16_t cost;
 } path_t;
 
+typedef struct priority_queue
+{
+  int length;
+  path_t path[DUNGEON_X * DUNGEON_Y];
+} priority_queue_t;
+
 int empty_dungeon(dungeon_t *d)
 {
   int x, y;
