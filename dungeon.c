@@ -678,6 +678,7 @@ void Dijkstra(dungeon_t *d, int *pc, int *npc, int *next_loc)
         temp_path.from[0] = -1;
         temp_path.from[1] = -1;
       }
+      printf("adding node\n");
       priority_queue_add_with_priority(&pq, &temp_path);
     }
   }
