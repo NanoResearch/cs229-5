@@ -26,7 +26,8 @@ typedef enum terrain_type
   ter_wall,
   ter_wall_immutable,
   ter_floor_room,
-  ter_floor_corridor
+  ter_floor_corridor,
+  ter_debug
 } terrain_type_t;
 
 typedef struct cell
@@ -225,6 +226,10 @@ int render_dungeon(dungeon_t *d)
           break;
         case ter_floor_corridor:
           putchar('.');
+          break;
+        // TODO: change this
+        case ter_debug:
+          putchar('*');
           break;
       }
     }
@@ -495,6 +500,11 @@ int save_dungeon(dungeon_t *d)
         room = 0;
         corridor = 1;
         break;
+      case ter_debug:
+        open = 1;
+        room = 1;
+        corridor = 0;
+        break;
       }
 
       hardness = d->cells[y][x].hardness;
@@ -676,5 +686,4 @@ int main (int argc, char *argv[])
     fprintf(stderr, "'--save' and/or '--load' are valid arguments\n");
   }
   return 0;
-
 }
