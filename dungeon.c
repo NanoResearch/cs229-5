@@ -18,6 +18,7 @@
 #define ROOM_SEPARATION         3
 #define MAX_PLACEMENT_ATTEMPTS  1000
 #define MAX_CELL_HARDNESS       255
+#define COST_MAX                65535
 
 #define rand_range(min, max) ((rand() % (((max) + 1) - (min))) + (min))
 
@@ -53,8 +54,8 @@ typedef struct dungeon
 } dungeon_t;
 
 typedef struct path {
-  uint8_t pos[2];
-  uint8_t from[2];
+  int pos[2];
+  int from[2];
   uint16_t cost;
 } path_t;
 
@@ -88,7 +89,6 @@ void priority_queue_perc_up(priority_queue_t *pq, int i_child, int i_parent)
 
 void priority_queue_add_with_priority(priority_queue_t *pq, path_t *path)
 {
-  printf("add node\n");
   int i_child, i_parent;
   pq->length++;
 
@@ -99,9 +99,8 @@ void priority_queue_add_with_priority(priority_queue_t *pq, path_t *path)
   priority_queue_perc_up(pq, i_child, i_parent);
 }
 
-void priority_queue_decrease_priority(priority_queue_t *pq, path_t *p, int cost)
+void priority_queue_decrease_priority(priority_queue_t *pq, path_t *p)
 {
-  printf("decrease priority\n");
   int i;
 
   for (i = 0; i < pq->length; i++)
@@ -111,7 +110,7 @@ void priority_queue_decrease_priority(priority_queue_t *pq, path_t *p, int cost)
       int i_child = i;
       int i_parent = (i - 1) / 2;
 
-      pq->path[i].cost = cost;
+      pq->path[i].cost = p->cost;
 
       priority_queue_perc_up(pq, i_child, i_parent);
       return;
@@ -122,7 +121,6 @@ void priority_queue_decrease_priority(priority_queue_t *pq, path_t *p, int cost)
 
 void priority_queue_extract_min(priority_queue_t *pq, path_t *p)
 {
-  printf("extract min\n");
   int i_parent = 0;
   int i_left_child = 1;
   int i_right_child = 2;
@@ -178,6 +176,21 @@ void priority_queue_extract_min(priority_queue_t *pq, path_t *p)
     }
   }
   pq->length--;
+}
+
+void priority_queue_get_match(priority_queue_t *pq, path_t *p)
+{
+  int i;
+
+  for (i = 0; i < pq->length; i++)
+  {
+    if (pq->path[i].pos[0] == p->pos[0] &&
+        pq->path[i].pos[1] == p->pos[1])
+    {
+      *p = pq->path[i];
+      return;
+    }
+  }
 }
 
 int empty_dungeon(dungeon_t *d)
@@ -639,6 +652,70 @@ int load_dungeon(dungeon_t *d)
   return 0;
 }
 
+void Dijkstra(dungeon_t *d, int *pc, int *npc, int *next_loc)
+{
+  int i, j;
+  priority_queue_t pq;
+  path_t temp_path, neighbor;
+
+  for (i = 0; i < DUNGEON_X; i++)
+  {
+    for (j = 0; j < DUNGEON_Y; i++)
+    {
+      if (i != npc[0] && j != npc[1])
+      {
+        temp_path.cost = COST_MAX;
+        temp_path.pos[0] = i;
+        temp_path.pos[1] = j;
+        temp_path.from[0] = -1;
+        temp_path.from[1] = -1;
+      }
+      else
+      {
+        temp_path.cost = 0;
+        temp_path.pos[0] = pc[0];
+        temp_path.pos[1] = pc[1];
+        temp_path.from[0] = -1;
+        temp_path.from[1] = -1;
+      }
+      priority_queue_add_with_priority(&pq, &temp_path);
+    }
+  }
+
+  while(pq.length != 0)
+  {
+    priority_queue_extract_min(&pq, &temp_path);
+
+    if (temp_path.pos[0] == npc[0] && temp_path.pos[1] == npc[1])
+    {
+      next_loc[0] = temp_path.from[0];
+      next_loc[1] = temp_path.from[1];
+      return;
+    }
+
+    for (i = -1; i <= 1; i++)
+    {
+      for (j = -1; j <= 1; j++)
+      {
+        if (i != 0 || j != 0)
+        {
+          neighbor.pos[0] = temp_path.pos[0] + i;
+          neighbor.pos[1] = temp_path.pos[1] + j;
+          priority_queue_get_match(&pq, &neighbor);
+          int alt_cost = temp_path.cost + 1;
+          if (alt_cost < neighbor.cost)
+          {
+            neighbor.cost = alt_cost;
+            neighbor.from[0] = temp_path.pos[0];
+            neighbor.from[1] = temp_path.pos[1];
+            priority_queue_decrease_priority(&pq, &neighbor);
+          }
+        }
+      }
+    }
+  }
+}
+
 int main (int argc, char *argv[])
 {
   dungeon_t d;
@@ -685,5 +762,33 @@ int main (int argc, char *argv[])
     fprintf(stderr, "Bad argument format\n");
     fprintf(stderr, "'--save' and/or '--load' are valid arguments\n");
   }
+
+
+
+  room_t room1 = d.rooms[rand_range(0, d.num_rooms - 1)];
+  room_t room2 = d.rooms[rand_range(0, d.num_rooms - 1)];
+  int npc[2], pc[2], new[2];
+  npc[0] = rand_range(room1.start_x, room1.end_x);
+  npc[1] = rand_range(room1.start_y, room1.end_y);
+  pc[0] = rand_range(room2.start_x, room2.end_x);
+  pc[1] = rand_range(room2.start_y, room2.end_y);
+
+  while (npc[0] != pc[0] && npc[1] != pc[1])
+  {
+    Dijkstra(&d, pc, npc, new);
+    d.cells[new[1]][new[0]].terrain = ter_debug;
+    npc[0] = new[0];
+    npc[1] = new[1];
+  }
+
+
+  render_dungeon(&d);
+
+
+
+
+
+
+
   return 0;
 }
