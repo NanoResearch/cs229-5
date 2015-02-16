@@ -7,14 +7,14 @@
 #include <string.h>
 #include <math.h>
 
-#define DUNGEON_X               160 //160
-#define DUNGEON_Y               96 //96
-#define MIN_ROOMS               12 //12
-#define MAX_ROOMS               24
+#define DUNGEON_X               50 //160
+#define DUNGEON_Y               50 //96
+#define MIN_ROOMS               2 //12
+#define MAX_ROOMS               2
 #define ROOM_MIN_X              8 //8
-#define ROOM_MAX_X              38
+#define ROOM_MAX_X              18
 #define ROOM_MIN_Y              5 //5
-#define ROOM_MAX_Y              35
+#define ROOM_MAX_Y              15
 #define ROOM_SEPARATION         3
 #define MAX_PLACEMENT_ATTEMPTS  1000
 #define MAX_CELL_HARDNESS       255
