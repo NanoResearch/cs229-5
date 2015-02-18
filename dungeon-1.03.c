@@ -4,7 +4,7 @@
 #include <time.h>
 #include <string.h>
 #include <sys/time.h>
-#include <endian.h>
+// #include <endian.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
@@ -141,8 +141,13 @@ void priority_queue_decrease_priority(priority_queue_t *pq, path_t *p)
   // error
 }
 
-void priority_queue_extract_min(priority_queue_t *pq, path_t *p)
+int priority_queue_extract_min(priority_queue_t *pq, path_t *p)
 {
+  if (pq->length == 0)
+  {
+    return -1;
+  }
+
   int i_parent = 0;
   int i_left_child = 1;
   int i_right_child = 2;
@@ -150,6 +155,7 @@ void priority_queue_extract_min(priority_queue_t *pq, path_t *p)
 
   *p = pq->path[0];
   pq->path[0] = pq->path[pq->length - 1];
+  pq->length--;
 
   while (i_left_child < pq->length)
   {
@@ -164,7 +170,7 @@ void priority_queue_extract_min(priority_queue_t *pq, path_t *p)
         pq->path[i_parent] = pq->path[i_left_child];
         pq->path[i_left_child] = temp_path;
 
-        i_parent = i_right_child;
+        i_parent = i_left_child;
         i_left_child = i_parent * 2 + 1;
         i_right_child = i_parent * 2 + 2;
       }
@@ -182,7 +188,7 @@ void priority_queue_extract_min(priority_queue_t *pq, path_t *p)
       }
       else
       {
-        return;
+        return 0;
       }
     }
     // no right child
@@ -194,10 +200,10 @@ void priority_queue_extract_min(priority_queue_t *pq, path_t *p)
         pq->path[i_parent] = pq->path[i_left_child];
         pq->path[i_left_child] = temp_path;
       }
-      return;
+      return 0;
     }
   }
-  pq->length--;
+  return 0;
 }
 
 void priority_queue_get_match(priority_queue_t *pq, path_t *p)
@@ -690,62 +696,62 @@ int makedirectory(char *dir)
   return 0;
 }
 
-int write_dungeon(dungeon_t *d)
-{
-  char *home;
-  char *filename;
-  FILE *f;
-  size_t len;
-  uint32_t be32;
-  uint16_t be16;
+// int write_dungeon(dungeon_t *d)
+// {
+//   char *home;
+//   char *filename;
+//   FILE *f;
+//   size_t len;
+//   uint32_t be32;
+//   uint16_t be16;
 
-  if (!(home = getenv("HOME"))) {
-    fprintf(stderr, "\"HOME\" is undefined.  Using working directory.\n");
-    home = ".";
-  }
+//   if (!(home = getenv("HOME"))) {
+//     fprintf(stderr, "\"HOME\" is undefined.  Using working directory.\n");
+//     home = ".";
+//   }
 
-  len = (strlen(home) + strlen(SAVE_DIR) + strlen(DUNGEON_SAVE_FILE) +
-         1 /* The NULL terminator */                                 +
-         2 /* The slashes */);
+//   len = (strlen(home) + strlen(SAVE_DIR) + strlen(DUNGEON_SAVE_FILE) +
+//          1 /* The NULL terminator */                                 +
+//          2 /* The slashes */);
 
-  filename = malloc(len * sizeof (*filename));
-  sprintf(filename, "%s/%s/", home, SAVE_DIR);
-  makedirectory(filename);
-  strcat(filename, DUNGEON_SAVE_FILE);
+//   filename = malloc(len * sizeof (*filename));
+//   sprintf(filename, "%s/%s/", home, SAVE_DIR);
+//   makedirectory(filename);
+//   strcat(filename, DUNGEON_SAVE_FILE);
 
-  if (!(f = fopen(filename, "w"))) {
-    perror(filename);
-    free(filename);
+//   if (!(f = fopen(filename, "w"))) {
+//     perror(filename);
+//     free(filename);
 
-    return 1;
-  }
-  free(filename);
+//     return 1;
+//   }
+//   free(filename);
 
-  /* The semantic, which is 6 bytes, 0-5 */
-  fwrite(DUNGEON_SAVE_SEMANTIC, 1, strlen(DUNGEON_SAVE_SEMANTIC), f);
+//   /* The semantic, which is 6 bytes, 0-5 */
+//   fwrite(DUNGEON_SAVE_SEMANTIC, 1, strlen(DUNGEON_SAVE_SEMANTIC), f);
 
-  /* The version, 4 bytes, 6-9 */
-  be32 = htobe32(DUNGEON_SAVE_VERSION);
-  fwrite(&be32, sizeof (be32), 1, f);
+//   /* The version, 4 bytes, 6-9 */
+//   be32 = htobe32(DUNGEON_SAVE_VERSION);
+//   fwrite(&be32, sizeof (be32), 1, f);
 
-  /* The size of the rest of the file, 4 bytes, 10-13 */
-  be32 = htobe32(calculate_dungeon_size(d));
-  fwrite(&be32, sizeof (be32), 1, f);
+//   /* The size of the rest of the file, 4 bytes, 10-13 */
+//   be32 = htobe32(calculate_dungeon_size(d));
+//   fwrite(&be32, sizeof (be32), 1, f);
 
-  /* The dungeon map, 61440 bytes, 14-61453 */
-  write_dungeon_map(d, f);
+//   /* The dungeon map, 61440 bytes, 14-61453 */
+//   write_dungeon_map(d, f);
 
-  /* The room count, 2 bytes, 61454-61455 */
-  be16 = htobe16(d->num_rooms);
-  fwrite(&be16, sizeof (be16), 1, f);
+//   /* The room count, 2 bytes, 61454-61455 */
+//   be16 = htobe16(d->num_rooms);
+//   fwrite(&be16, sizeof (be16), 1, f);
 
-  /* And the rooms, be16 * 4 bytes, 61456-end */
-  write_rooms(d, f);
+//   /* And the rooms, be16 * 4 bytes, 61456-end */
+//   write_rooms(d, f);
 
-  fclose(f);
+//   fclose(f);
 
-  return 0;
-}
+//   return 0;
+// }
 
 int read_dungeon_map(dungeon_t *d, FILE *f)
 {
@@ -788,90 +794,90 @@ int read_rooms(dungeon_t *d, FILE *f)
   return 0;
 }
 
-int read_dungeon(dungeon_t *d, char *file)
-{
-  char semantic[6];
-  uint32_t be32;
-  uint16_t be16;
-  FILE *f;
-  char *home;
-  size_t len;
-  char *filename;
-  struct stat buf;
+// int read_dungeon(dungeon_t *d, char *file)
+// {
+//   char semantic[6];
+//   uint32_t be32;
+//   uint16_t be16;
+//   FILE *f;
+//   char *home;
+//   size_t len;
+//   char *filename;
+//   struct stat buf;
 
-  if (!file) {
-    if (!(home = getenv("HOME"))) {
-      fprintf(stderr, "\"HOME\" is undefined.  Using working directory.\n");
-      home = ".";
-    }
+//   if (!file) {
+//     if (!(home = getenv("HOME"))) {
+//       fprintf(stderr, "\"HOME\" is undefined.  Using working directory.\n");
+//       home = ".";
+//     }
 
-    len = (strlen(home) + strlen(SAVE_DIR) + strlen(DUNGEON_SAVE_FILE) +
-           1 /* The NULL terminator */                                 +
-           2 /* The slashes */);
+//     len = (strlen(home) + strlen(SAVE_DIR) + strlen(DUNGEON_SAVE_FILE) +
+//            1 /* The NULL terminator */                                 +
+//            2 /* The slashes */);
 
-    filename = malloc(len * sizeof (*filename));
-    sprintf(filename, "%s/%s/%s", home, SAVE_DIR, DUNGEON_SAVE_FILE);
+//     filename = malloc(len * sizeof (*filename));
+//     sprintf(filename, "%s/%s/%s", home, SAVE_DIR, DUNGEON_SAVE_FILE);
 
-    if (!(f = fopen(filename, "r"))) {
-      perror(filename);
-      free(filename);
-      exit(-1);
-    }
+//     if (!(f = fopen(filename, "r"))) {
+//       perror(filename);
+//       free(filename);
+//       exit(-1);
+//     }
 
-    if (stat(filename, &buf)) {
-      perror(filename);
-      exit(-1);
-    }
+//     if (stat(filename, &buf)) {
+//       perror(filename);
+//       exit(-1);
+//     }
 
-    free(filename);
-  } else {
-    if (!(f = fopen(file, "r"))) {
-      perror(file);
-      exit(-1);
-    }
-    if (stat(file, &buf)) {
-      perror(file);
-      exit(-1);
-    }
+//     free(filename);
+//   } else {
+//     if (!(f = fopen(file, "r"))) {
+//       perror(file);
+//       exit(-1);
+//     }
+//     if (stat(file, &buf)) {
+//       perror(file);
+//       exit(-1);
+//     }
 
-  }
+//   }
 
-  d->num_rooms = 0;
-  /* 16 is the 14 byte header + the two byte room count */
-  if (buf.st_size < 16 + calculate_dungeon_size(d)) {
-    fprintf(stderr, "Dungeon appears to be truncated.\n");
-    exit(-1);
-  }
+//   d->num_rooms = 0;
+//   /* 16 is the 14 byte header + the two byte room count */
+//   if (buf.st_size < 16 + calculate_dungeon_size(d)) {
+//     fprintf(stderr, "Dungeon appears to be truncated.\n");
+//     exit(-1);
+//   }
 
-  fread(semantic, sizeof(semantic), 1, f);
-  semantic[6] = '\0';
-  if (strncmp(semantic, DUNGEON_SAVE_SEMANTIC, 6)) {
-    fprintf(stderr, "Not an RLG229 save file.\n");
-    exit(-1);
-  }
-  fread(&be32, sizeof (be32), 1, f);
-  if (be32toh(be32) != 0) { /* Since we expect zero, be32toh() is a no-op. */
-    fprintf(stderr, "File version mismatch.\n");
-    exit(-1);
-  }
-  fread(&be32, sizeof (be32), 1, f);
-  if (buf.st_size - 14 != be32toh(be32)) {
-    fprintf(stderr, "File size mismatch.\n");
-    exit(-1);
-  }
-  read_dungeon_map(d, f);
-  fread(&be16, sizeof (be16), 1, f);
-  d->num_rooms = be16toh(be16);
-  if (buf.st_size != 14 + calculate_dungeon_size(d)) {
-    fprintf(stderr, "Incorrect file size.\n");
-    exit(-1);
-  }
-  read_rooms(d, f);
+//   fread(semantic, sizeof(semantic), 1, f);
+//   semantic[6] = '\0';
+//   if (strncmp(semantic, DUNGEON_SAVE_SEMANTIC, 6)) {
+//     fprintf(stderr, "Not an RLG229 save file.\n");
+//     exit(-1);
+//   }
+//   fread(&be32, sizeof (be32), 1, f);
+//   if (be32toh(be32) != 0) { /* Since we expect zero, be32toh() is a no-op. */
+//     fprintf(stderr, "File version mismatch.\n");
+//     exit(-1);
+//   }
+//   fread(&be32, sizeof (be32), 1, f);
+//   if (buf.st_size - 14 != be32toh(be32)) {
+//     fprintf(stderr, "File size mismatch.\n");
+//     exit(-1);
+//   }
+//   read_dungeon_map(d, f);
+//   fread(&be16, sizeof (be16), 1, f);
+//   d->num_rooms = be16toh(be16);
+//   if (buf.st_size != 14 + calculate_dungeon_size(d)) {
+//     fprintf(stderr, "Incorrect file size.\n");
+//     exit(-1);
+//   }
+//   read_rooms(d, f);
 
-  fclose(f);
+//   fclose(f);
 
-  return 0;
-}
+//   return 0;
+// }
 
 void usage(char *name)
 {
@@ -1029,7 +1035,7 @@ int main(int argc, char *argv[])
   srand(seed);
 
   if (do_load) {
-    read_dungeon(&d, save_file);
+    // read_dungeon(&d, save_file);
   } else {
     gen_dungeon(&d);
   }
@@ -1037,21 +1043,21 @@ int main(int argc, char *argv[])
   render_dungeon(&d);
 
   if (do_save) {
-    write_dungeon(&d);
+    // write_dungeon(&d);
   }
 
 
   priority_queue_t pq;
   path_t path, path1, path2, path3, path4, path5, path6, path7, path8;
 
-  path1.cost = 6;
+  path1.cost = 299;
   path2.cost = 34;
-  path3.cost = 8;
-  path4.cost = 4;
+  path3.cost = 47;
+  path4.cost = 56;
   path5.cost = 98;
-  path6.cost = 4;
-  path7.cost = 6;
-  path8.cost = 8;
+  path6.cost = 45;
+  path7.cost = 1;
+  path8.cost = 45;
 
   priority_queue_add_with_priority(&pq, &path1);
   priority_queue_add_with_priority(&pq, &path2);
@@ -1062,12 +1068,66 @@ int main(int argc, char *argv[])
   priority_queue_add_with_priority(&pq, &path7);
   priority_queue_add_with_priority(&pq, &path8);
 
-  priority_queue_extract_min(&pq, &path);
-  printf("%d\n", path.cost);
 
+  if (priority_queue_extract_min(&pq, &path) == 0)
+  {
+    printf("%d\n", path.cost);
+    for (i = 0; i < pq.length; i++)
+    {
+      printf("%d, ", pq.path[i].cost);
+    }
+    printf("\n");
+  }
 
+  if (priority_queue_extract_min(&pq, &path) == 0)
+  {
+    printf("%d\n", path.cost);
+    for (i = 0; i < pq.length; i++)
+    {
+      printf("%d, ", pq.path[i].cost);
+    }
+    printf("\n");
+  }
 
+  if (priority_queue_extract_min(&pq, &path) == 0)
+  {
+    printf("%d\n", path.cost);
+    for (i = 0; i < pq.length; i++)
+    {
+      printf("%d, ", pq.path[i].cost);
+    }
+    printf("\n");
+  }
 
+  if (priority_queue_extract_min(&pq, &path) == 0)
+  {
+    printf("%d\n", path.cost);
+    for (i = 0; i < pq.length; i++)
+    {
+      printf("%d, ", pq.path[i].cost);
+    }
+    printf("\n");
+  }
+
+  if (priority_queue_extract_min(&pq, &path) == 0)
+  {
+    printf("%d\n", path.cost);
+    for (i = 0; i < pq.length; i++)
+    {
+      printf("%d, ", pq.path[i].cost);
+    }
+    printf("\n");
+  }
+
+  if (priority_queue_extract_min(&pq, &path) == 0)
+  {
+    printf("%d\n", path.cost);
+    for (i = 0; i < pq.length; i++)
+    {
+      printf("%d, ", pq.path[i].cost);
+    }
+    printf("\n");
+  }
 
   return 0;
 }
