@@ -928,8 +928,6 @@ void Dijkstra(dungeon_t *d, int pc_x, int pc_y, int npc_x, int npc_y, int *new_x
   {
     priority_queue_extract_min(&pq, &temp_path);
 
-    printf("pc loc: %d, %d\n", neighbor.pos[0], neighbor.pos[1]);
-    printf("npc loc: %d, %d\n", npc_x, npc_y);
     if (temp_path.pos[0] == npc_x && temp_path.pos[1] == npc_y)
     {
       *new_x = temp_path.from[0];
@@ -1071,7 +1069,6 @@ int main(int argc, char *argv[])
   int pc_x = rand_range(room2.position[0], room2.position[0] + room2.size[0]);
   int pc_y = rand_range(room2.position[1], room2.position[1] + room2.size[1]);
 
-  printf("npc loc: %d, %d\n", npc_x, npc_y);
   while (npc_x != pc_x && npc_y != pc_y)
   {
     Dijkstra(&d, pc_x, pc_y, npc_x, npc_y, &new_x, &new_y);
@@ -1080,7 +1077,6 @@ int main(int argc, char *argv[])
     npc_y = new_y;
   }
 
-  printf("\n");
   render_dungeon(&d);
 
   return 0;
