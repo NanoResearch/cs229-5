@@ -15,8 +15,8 @@
  * statement as a minimum room size, so strictly speaking, this is not    *
  * compliant.                                                             */
 
-#define DUNGEON_X              10
-#define DUNGEON_Y              10
+#define DUNGEON_X              20
+#define DUNGEON_Y              20
 #define MIN_ROOMS              2
 #define MAX_ROOMS              12
 #define ROOM_MIN_X             3
