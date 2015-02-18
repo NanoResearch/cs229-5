@@ -15,13 +15,13 @@
  * statement as a minimum room size, so strictly speaking, this is not    *
  * compliant.                                                             */
 
-#define DUNGEON_X              160
-#define DUNGEON_Y              96
-#define MIN_ROOMS              12
-#define MAX_ROOMS              24
-#define ROOM_MIN_X             10
-#define ROOM_MIN_Y             8
-#define ROOM_SEPARATION        5
+#define DUNGEON_X              30
+#define DUNGEON_Y              30
+#define MIN_ROOMS              2
+#define MAX_ROOMS              12
+#define ROOM_MIN_X             3
+#define ROOM_MIN_Y             3
+#define ROOM_SEPARATION        3
 #define MAX_PLACEMENT_ATTEMPTS 1000
 #define SAVE_DIR               ".rlg229"
 #define DUNGEON_SAVE_FILE      "dungeon"
