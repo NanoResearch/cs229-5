@@ -1062,7 +1062,7 @@ int main(int argc, char *argv[])
   priority_queue_add_with_priority(&pq, &path7);
   priority_queue_add_with_priority(&pq, &path8);
 
-  priority_queue_extract_min(*pq, *path);
+  priority_queue_extract_min(&pq, &path);
   printf("%d\n", path.cost);
 
 
