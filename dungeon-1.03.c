@@ -74,6 +74,146 @@ typedef struct dungeon {
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
 } dungeon_t;
 
+typedef struct path {
+  int pos[2];
+  int from[2];
+  uint16_t cost;
+} path_t;
+
+typedef struct priority_queue
+{
+  int length;
+  path_t path[DUNGEON_X * DUNGEON_Y];
+} priority_queue_t;
+
+void priority_queue_init(priority_queue_t *pq)
+{
+  pq->length = 0;
+}
+
+void priority_queue_perc_up(priority_queue_t *pq, int i_child, int i_parent)
+{
+  path_t temp_path;
+
+  while (pq->path[i_parent].cost >= pq->path[i_child].cost && i_child != 0)
+  {
+    temp_path = pq->path[i_parent];
+    pq->path[i_parent] = pq->path[i_child];
+    pq->path[i_child] = temp_path;
+
+    i_child = i_parent;
+    i_parent = (i_child - 1) / 2;
+  }
+
+  return;
+}
+
+void priority_queue_add_with_priority(priority_queue_t *pq, path_t *path)
+{
+  int i_child, i_parent;
+  pq->length++;
+
+  i_child = pq->length - 1;
+  pq->path[i_child] = *path;
+  i_parent = (i_child - 1) / 2;
+
+  priority_queue_perc_up(pq, i_child, i_parent);
+}
+
+void priority_queue_decrease_priority(priority_queue_t *pq, path_t *p)
+{
+  int i;
+
+  for (i = 0; i < pq->length; i++)
+  {
+    if (pq->path[i].pos[0] == p->pos[0] && pq->path[i].pos[1] == p->pos[1])
+    {
+      int i_child = i;
+      int i_parent = (i - 1) / 2;
+
+      pq->path[i].cost = p->cost;
+
+      priority_queue_perc_up(pq, i_child, i_parent);
+      return;
+    }
+  }
+  // error
+}
+
+void priority_queue_extract_min(priority_queue_t *pq, path_t *p)
+{
+  int i_parent = 0;
+  int i_left_child = 1;
+  int i_right_child = 2;
+  path_t temp_path;
+
+  *p = pq->path[0];
+  pq->path[0] = pq->path[pq->length - 1];
+
+  while (i_left_child < pq->length)
+  {
+    // left and right children
+    if (i_right_child < pq->length)
+    {
+      // left child is smallest
+      if(pq->path[i_left_child].cost < pq->path[i_parent].cost &&
+         pq->path[i_left_child].cost <= pq->path[i_right_child].cost)
+      {
+        temp_path = pq->path[i_parent];
+        pq->path[i_parent] = pq->path[i_left_child];
+        pq->path[i_left_child] = temp_path;
+
+        i_parent = i_right_child;
+        i_left_child = i_parent * 2 + 1;
+        i_right_child = i_parent * 2 + 2;
+      }
+      // right child is smallest
+      else if (pq->path[i_right_child].cost < pq->path[i_parent].cost &&
+               pq->path[i_right_child].cost <= pq->path[i_left_child].cost)
+      {
+        temp_path = pq->path[i_parent];
+        pq->path[i_parent] = pq->path[i_right_child];
+        pq->path[i_right_child] = temp_path;
+
+        i_parent = i_right_child;
+        i_left_child = i_parent * 2 + 1;
+        i_right_child = i_parent * 2 + 2;
+      }
+      else
+      {
+        return;
+      }
+    }
+    // no right child
+    else
+    {
+      if (pq->path[i_left_child].cost < pq->path[i_parent].cost)
+      {
+        temp_path = pq->path[i_parent];
+        pq->path[i_parent] = pq->path[i_left_child];
+        pq->path[i_left_child] = temp_path;
+      }
+      return;
+    }
+  }
+  pq->length--;
+}
+
+void priority_queue_get_match(priority_queue_t *pq, path_t *p)
+{
+  int i;
+
+  for (i = 0; i < pq->length; i++)
+  {
+    if (pq->path[i].pos[0] == p->pos[0] &&
+        pq->path[i].pos[1] == p->pos[1])
+    {
+      *p = pq->path[i];
+      return;
+    }
+  }
+}
+
 int point_in_room_p(room_t *r, pair_t p)
 {
   return ((r->position[dim_x] <= p[dim_x]) &&
