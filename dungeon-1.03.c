@@ -1047,87 +1047,108 @@ int main(int argc, char *argv[])
   }
 
 
-  priority_queue_t pq;
-  path_t path, path1, path2, path3, path4, path5, path6, path7, path8;
+  room_t room1 = d.rooms[rand_range(0, d.num_rooms - 1)];
+  room_t room2 = d.rooms[rand_range(0, d.num_rooms - 1)];
+  int npc[2], pc[2], new[2];
+  npc[0] = rand_range(room1.position[0], room1.position[0] + room1.size[0]);
+  npc[1] = rand_range(room1.position[1], room1.position[1] + room1.size[1]);
+  pc[0] = rand_range(room2.position[0], room2.position[0] + room2.size[0]);
+  pc[1] = rand_range(room2.position[1], room2.position[1] + room2.size[1]);
 
-  path1.cost = 299;
-  path2.cost = 34;
-  path3.cost = 47;
-  path4.cost = 56;
-  path5.cost = 98;
-  path6.cost = 45;
-  path7.cost = 1;
-  path8.cost = 45;
-
-  priority_queue_add_with_priority(&pq, &path1);
-  priority_queue_add_with_priority(&pq, &path2);
-  priority_queue_add_with_priority(&pq, &path3);
-  priority_queue_add_with_priority(&pq, &path4);
-  priority_queue_add_with_priority(&pq, &path5);
-  priority_queue_add_with_priority(&pq, &path6);
-  priority_queue_add_with_priority(&pq, &path7);
-  priority_queue_add_with_priority(&pq, &path8);
-
-
-  if (priority_queue_extract_min(&pq, &path) == 0)
+  while (npc[0] != pc[0] && npc[1] != pc[1])
   {
-    printf("%d\n", path.cost);
-    for (i = 0; i < pq.length; i++)
-    {
-      printf("%d, ", pq.path[i].cost);
-    }
-    printf("\n");
+    Dijkstra(&d, pc, npc, new);
+    d.map[new[1]][new[0]] = ter_debug;
+    npc[0] = new[0];
+    npc[1] = new[1];
   }
 
-  if (priority_queue_extract_min(&pq, &path) == 0)
-  {
-    printf("%d\n", path.cost);
-    for (i = 0; i < pq.length; i++)
-    {
-      printf("%d, ", pq.path[i].cost);
-    }
-    printf("\n");
-  }
 
-  if (priority_queue_extract_min(&pq, &path) == 0)
-  {
-    printf("%d\n", path.cost);
-    for (i = 0; i < pq.length; i++)
-    {
-      printf("%d, ", pq.path[i].cost);
-    }
-    printf("\n");
-  }
+  render_dungeon(&d);
 
-  if (priority_queue_extract_min(&pq, &path) == 0)
-  {
-    printf("%d\n", path.cost);
-    for (i = 0; i < pq.length; i++)
-    {
-      printf("%d, ", pq.path[i].cost);
-    }
-    printf("\n");
-  }
 
-  if (priority_queue_extract_min(&pq, &path) == 0)
-  {
-    printf("%d\n", path.cost);
-    for (i = 0; i < pq.length; i++)
-    {
-      printf("%d, ", pq.path[i].cost);
-    }
-    printf("\n");
-  }
 
-  if (priority_queue_extract_min(&pq, &path) == 0)
-  {
-    printf("%d\n", path.cost);
-    for (i = 0; i < pq.length; i++)
-    {
-      printf("%d, ", pq.path[i].cost);
-    }
-    printf("\n");
-  }
+  // priority_queue_t pq;
+  // path_t path, path1, path2, path3, path4, path5, path6, path7, path8;
+
+  // path1.cost = 299;
+  // path2.cost = 34;
+  // path3.cost = 47;
+  // path4.cost = 56;
+  // path5.cost = 98;
+  // path6.cost = 45;
+  // path7.cost = 1;
+  // path8.cost = 45;
+
+  // priority_queue_add_with_priority(&pq, &path1);
+  // priority_queue_add_with_priority(&pq, &path2);
+  // priority_queue_add_with_priority(&pq, &path3);
+  // priority_queue_add_with_priority(&pq, &path4);
+  // priority_queue_add_with_priority(&pq, &path5);
+  // priority_queue_add_with_priority(&pq, &path6);
+  // priority_queue_add_with_priority(&pq, &path7);
+  // priority_queue_add_with_priority(&pq, &path8);
+
+
+  // if (priority_queue_extract_min(&pq, &path) == 0)
+  // {
+  //   printf("%d\n", path.cost);
+  //   for (i = 0; i < pq.length; i++)
+  //   {
+  //     printf("%d, ", pq.path[i].cost);
+  //   }
+  //   printf("\n");
+  // }
+
+  // if (priority_queue_extract_min(&pq, &path) == 0)
+  // {
+  //   printf("%d\n", path.cost);
+  //   for (i = 0; i < pq.length; i++)
+  //   {
+  //     printf("%d, ", pq.path[i].cost);
+  //   }
+  //   printf("\n");
+  // }
+
+  // if (priority_queue_extract_min(&pq, &path) == 0)
+  // {
+  //   printf("%d\n", path.cost);
+  //   for (i = 0; i < pq.length; i++)
+  //   {
+  //     printf("%d, ", pq.path[i].cost);
+  //   }
+  //   printf("\n");
+  // }
+
+  // if (priority_queue_extract_min(&pq, &path) == 0)
+  // {
+  //   printf("%d\n", path.cost);
+  //   for (i = 0; i < pq.length; i++)
+  //   {
+  //     printf("%d, ", pq.path[i].cost);
+  //   }
+  //   printf("\n");
+  // }
+
+  // if (priority_queue_extract_min(&pq, &path) == 0)
+  // {
+  //   printf("%d\n", path.cost);
+  //   for (i = 0; i < pq.length; i++)
+  //   {
+  //     printf("%d, ", pq.path[i].cost);
+  //   }
+  //   printf("\n");
+  // }
+
+  // if (priority_queue_extract_min(&pq, &path) == 0)
+  // {
+  //   printf("%d\n", path.cost);
+  //   for (i = 0; i < pq.length; i++)
+  //   {
+  //     printf("%d, ", pq.path[i].cost);
+  //   }
+  //   printf("\n");
+  // }
 
   return 0;
 }
