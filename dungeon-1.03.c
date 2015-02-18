@@ -1053,7 +1053,7 @@ int main(int argc, char *argv[])
   while (npc[0] != pc[0] && npc[1] != pc[1])
   {
     Dijkstra(&d, pc, npc, new);
-    d.map[new[1]][new[0]].terrain = ter_debug;
+    d.map[new[1]][new[0]] = ter_debug;
     npc[0] = new[0];
     npc[1] = new[1];
   }
