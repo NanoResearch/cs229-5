@@ -4,7 +4,7 @@
 #include <time.h>
 #include <string.h>
 #include <sys/time.h>
-// #include <endian.h>
+#include <endian.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
