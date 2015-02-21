@@ -6,6 +6,7 @@
 
 # include "heap.h"
 # include "macros.h"
+# include "character.h"
 
 typedef enum dim {
   dim_x,
@@ -67,6 +68,9 @@ typedef struct dungeon {
    * and pulling in unnecessary data with each map cell would add a lot   *
    * of overhead to the memory system.                                    */
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
+  uint32_t num_mon;
+  character_t *chars;
+  heap_t turn_list;
 } dungeon_t;
 
 int read_dungeon(dungeon_t *dungeon, char *filename);
