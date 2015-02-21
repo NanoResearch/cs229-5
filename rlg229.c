@@ -111,6 +111,8 @@ int main(int argc, char *argv[])
   printf("Seed is %ld.\n", seed);
   srand(seed);
 
+  d.num_mon = nummon;
+
   init_dungeon(&d);
 
   if (do_load) {

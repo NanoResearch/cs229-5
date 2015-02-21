@@ -8,6 +8,7 @@
 #include <limits.h>
 
 #include "dungeon.h"
+#include "character.h"
 #include "utils.h"
 #include "heap.h"
 
@@ -778,4 +779,6 @@ void delete_dungeon(dungeon_t *d)
 void init_dungeon(dungeon_t *d)
 {
   empty_dungeon(d);
+  character_t chars[d->num_mon + 1];
+  d->chars = chars;
 }
