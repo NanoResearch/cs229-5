@@ -28,8 +28,6 @@ int main(int argc, char *argv[])
   uint32_t do_load, do_store, do_seed;
   uint32_t long_arg;
   char *save_file;
-  pair_t from, to;
-  uint32_t from_room, to_room;
 
   /* Default behavior: Seed with the time, generate a new dungeon, *
    * and don't write to disk.                                      */
@@ -120,23 +118,6 @@ int main(int argc, char *argv[])
   } else {
     gen_dungeon(&d);
   }
-
-  from_room = rand_range(0, d.num_rooms - 1);
-  while ((to_room = rand_range(0, d.num_rooms - 1)) == from_room)
-    ;
-  from[dim_x] = rand_range(d.rooms[from_room].position[dim_x],
-                           (d.rooms[from_room].position[dim_x] +
-                            d.rooms[from_room].size[dim_x] - 1));
-  from[dim_y] = rand_range(d.rooms[from_room].position[dim_y],
-                           (d.rooms[from_room].position[dim_y] +
-                            d.rooms[from_room].size[dim_y] - 1));
-  to[dim_x] = rand_range(d.rooms[to_room].position[dim_x],
-                           (d.rooms[to_room].position[dim_x] +
-                            d.rooms[to_room].size[dim_x] - 1));
-  to[dim_y] = rand_range(d.rooms[to_room].position[dim_y],
-                           (d.rooms[to_room].position[dim_y] +
-                            d.rooms[to_room].size[dim_y] - 1));
-  dijkstra(&d, from, to);
 
   render_dungeon(&d);
 
