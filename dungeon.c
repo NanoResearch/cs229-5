@@ -185,8 +185,8 @@ int connect_two_points_recursive(dungeon_t *d, pair_t e1, pair_t e2)
   max_y = ((min_y == e1) ? e2 : e1);
 
   if ((max_x[dim_x] - min_x[dim_x]) + 
-      (max_y[dim_y] - min_y[dim_y]) < 15
-) {
+      (max_y[dim_y] - min_y[dim_y]) < 15)
+  {
     return connect_two_points(d, min_x, max_x, min_y, max_y);
   }
 

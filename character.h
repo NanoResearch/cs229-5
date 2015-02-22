@@ -16,13 +16,13 @@ typedef struct npc {
 } npc_t;
 
 typedef struct character {
+  uint32_t alive;
   char_type_t type;
   pc_t pc;
   npc_t npc;
   char symbol;
   uint8_t speed;
   uint16_t pos[2];
-  uint32_t alive;
 } character_t;
 
 #endif
