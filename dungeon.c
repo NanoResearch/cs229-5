@@ -456,6 +456,55 @@ int gen_dungeon(dungeon_t *d)
   return 0;
 }
 
+int set_character_start_pos(dungeon_t *d, uint32_t char_num)
+{
+  int i, room_num, room_pos[2];
+
+  room_num = rand_range(0, d->num_rooms - 1);
+  room_pos[0] = d->rooms[room_num].position[dim_x] + rand_range(0, d->rooms[room_num].size[dim_x] - 1);
+  room_pos[1] = d->rooms[room_num].position[dim_y] + rand_range(0, d->rooms[room_num].size[dim_y] - 1);
+
+  for (i = 0; i < char_num; i++)
+  {
+    if (room_pos[0] == d->chars[i].pos[0] && room_pos[1] == d->chars[i].pos[1])
+    {
+      i = 0;
+      room_num = rand_range(0, d->num_rooms - 1);
+      room_pos[0] = d->rooms[room_num].position[dim_x] + rand_range(0, d->rooms[room_num].size[dim_x] - 1);
+      room_pos[1] = d->rooms[room_num].position[dim_y] + rand_range(0, d->rooms[room_num].size[dim_y] - 1);
+    }
+  }
+
+  d->chars[char_num].pos[0] = room_pos[0];
+  d->chars[char_num].pos[1] = room_pos[1];
+
+  return 0;
+}
+
+int gen_characters(dungeon_t *d)
+{
+  int i;
+
+  d->chars[0].alive = 1;
+  d->chars[0].type = pc;
+  d->chars[0].symbol = '@';
+  d->chars[0].speed = PC_SPEED;
+  set_character_start_pos(d, 0);
+
+  for (i = 1; i < d->num_char; i++)
+  {
+    d->chars[i].alive = 1;
+    d->chars[i].type = npc;
+    d->chars[i].symbol = 'A' + (random() % 26);
+    d->chars[i].speed = rand_range(5, 20);
+    set_character_start_pos(d, i);
+    d->chars[i].npc.smart = rand_range(0, 1);
+    d->chars[i].npc.tele = rand_range(0, 1);
+  }
+
+  return 0;
+}
+
 void render_dungeon(dungeon_t *d)
 {
   pair_t p;
@@ -779,6 +828,4 @@ void delete_dungeon(dungeon_t *d)
 void init_dungeon(dungeon_t *d)
 {
   empty_dungeon(d);
-  character_t chars[d->num_mon + 1];
-  d->chars = chars;
 }

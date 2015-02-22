@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
   printf("Seed is %ld.\n", seed);
   srand(seed);
 
-  d.num_mon = nummon;
+  d.num_char = nummon + 1;
 
   init_dungeon(&d);
 
@@ -117,6 +117,7 @@ int main(int argc, char *argv[])
     read_dungeon(&d, save_file);
   } else {
     gen_dungeon(&d);
+    gen_characters(&d);
   }
 
   render_dungeon(&d);
