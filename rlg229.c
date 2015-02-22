@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     putchar('\n');
     move_pc(&d);
     render_dungeon(&d);
-    usleep(10000);
+    usleep(200000);
   }
 
   if (do_store) {
