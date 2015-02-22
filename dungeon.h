@@ -76,6 +76,7 @@ typedef struct dungeon {
 int read_dungeon(dungeon_t *dungeon, char *filename);
 int gen_dungeon(dungeon_t *dungeon);
 int gen_characters(dungeon_t *dungeon);
+void move_pc(dungeon_t *dungeon);
 void render_dungeon(dungeon_t *dungeon);
 int write_dungeon(dungeon_t *dungeon);
 void init_dungeon(dungeon_t *d);

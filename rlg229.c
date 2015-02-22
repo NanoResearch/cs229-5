@@ -122,6 +122,14 @@ int main(int argc, char *argv[])
 
   render_dungeon(&d);
 
+  while (1)
+  {
+    putchar('\n');
+    move_pc(&d);
+    render_dungeon(&d);
+    usleep(10000);
+  }
+
   if (do_store) {
     write_dungeon(&d);
   }

@@ -505,6 +505,34 @@ int gen_characters(dungeon_t *d)
   return 0;
 }
 
+void move_pc(dungeon_t *d)
+{
+  int delta[2], new_pos[2];
+
+  while (1)
+  {
+    delta[0] = rand_range(-1, 1);
+    delta[1] = rand_range(-1, 1);
+
+    new_pos[0] = d->chars[0].pos[0] + delta[0];
+    new_pos[1] = d->chars[0].pos[1] + delta[1];
+
+    if (new_pos[0] >= 0 && new_pos[0] < DUNGEON_X &&
+        new_pos[1] >= 0 && new_pos[1] < DUNGEON_Y)
+    {
+      if (   d->map[new_pos[1]][new_pos[0]] == ter_floor
+          || d->map[new_pos[1]][new_pos[0]] == ter_floor_room
+          || d->map[new_pos[1]][new_pos[0]] == ter_floor_hall
+          || d->map[new_pos[1]][new_pos[0]] == ter_floor_tentative)
+      {
+        d->chars[0].pos[0] = new_pos[0];
+        d->chars[0].pos[1] = new_pos[1];
+        break;
+      }
+    }
+  }
+}
+
 void render_dungeon(dungeon_t *d)
 {
   int i;
