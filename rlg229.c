@@ -122,12 +122,31 @@ int main(int argc, char *argv[])
 
   render_dungeon(&d);
 
+  int char_num;
   while (1)
   {
-    putchar('\n');
-    move_pc(&d);
+    for (char_num = 0; char_num < d.num_char; char_num++)
+    {
+      if (d.chars[char_num].alive == 1)
+      {
+        if (char_num == 0)
+        {
+          move_pc(&d);
+        }
+        else
+        {
+          if (move_npc(&d, char_num) == 1)
+          {
+            render_dungeon(&d);
+            printf("\nGame over. PC Killed.\n");
+            return 0;
+          }
+        }
+      }
+    }
+
     render_dungeon(&d);
-    usleep(200000);
+    usleep(20000);
   }
 
   if (do_store) {

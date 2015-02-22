@@ -507,7 +507,7 @@ int gen_characters(dungeon_t *d)
 
 void move_pc(dungeon_t *d)
 {
-  int delta[2], new_pos[2];
+  int i, delta[2], new_pos[2];
 
   while (1)
   {
@@ -531,6 +531,72 @@ void move_pc(dungeon_t *d)
       }
     }
   }
+
+  for (i = 1; i < d->num_char; i++)
+  {
+    if (d->chars[i].alive == 1)
+    {
+      if (new_pos[0] == d->chars[i].pos[0] && new_pos[1] == d->chars[i].pos[1])
+      {
+        d->chars[i].alive = 0;
+        return;
+      }
+    }
+  }
+}
+
+int move_npc(dungeon_t *d, uint32_t char_num)
+{
+  int i, delta[2], new_pos[2];
+
+  while (1)
+  {
+    delta[0] = rand_range(-1, 1);
+    delta[1] = rand_range(-1, 1);
+
+    new_pos[0] = d->chars[char_num].pos[0] + delta[0];
+    new_pos[1] = d->chars[char_num].pos[1] + delta[1];
+
+    if (new_pos[0] >= 0 && new_pos[0] < DUNGEON_X &&
+        new_pos[1] >= 0 && new_pos[1] < DUNGEON_Y)
+    {
+      if (   d->map[new_pos[1]][new_pos[0]] == ter_floor
+          || d->map[new_pos[1]][new_pos[0]] == ter_floor_room
+          || d->map[new_pos[1]][new_pos[0]] == ter_floor_hall
+          || d->map[new_pos[1]][new_pos[0]] == ter_floor_tentative)
+      {
+        d->chars[char_num].pos[0] = new_pos[0];
+        d->chars[char_num].pos[1] = new_pos[1];
+        break;
+      }
+    }
+  }
+
+  // loop through all characters
+  for (i = 0; i < d->num_char; i++)
+  {
+    // skip characters that aren't alive or if it is itself
+    if (d->chars[i].alive == 1 && i != char_num)
+    {
+      if (new_pos[0] == d->chars[i].pos[0] && new_pos[1] == d->chars[i].pos[1])
+      {
+        d->chars[i].alive = 0;
+
+        // pc killed
+        if (i == 0)
+        {
+          return 1;
+        }
+        // monster killed
+        else
+        {
+          return 0;
+        }
+      }
+    }
+  }
+
+  return 0;
 }
 
 void render_dungeon(dungeon_t *d)
@@ -546,7 +612,7 @@ void render_dungeon(dungeon_t *d)
       char_placed = -1;
       for (i = 0; i < d->num_char; i++)
       {
-        if (d->chars[i].pos[0] == p[dim_x] && d->chars[i].pos[1] == p[dim_y])
+        if (d->chars[i].pos[0] == p[dim_x] && d->chars[i].pos[1] == p[dim_y] && d->chars[i].alive == 1)
         {
           putchar(d->chars[i].symbol);
           char_placed = 0;
@@ -577,6 +643,7 @@ void render_dungeon(dungeon_t *d)
     }
     putchar('\n');
   }
+  putchar('\n');
 }
 
 static int write_dungeon_map(dungeon_t *d, FILE *f)
