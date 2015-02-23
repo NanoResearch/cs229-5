@@ -17,7 +17,7 @@ static int32_t dist_cmp(const void *key, const void *with) {
   return ((path_t *) key)->cost - ((path_t *) with)->cost;
 }
 
-void dijkstra(dungeon_t *d, pair_t from, pair_t to)
+void dijkstra(dungeon_t *d, pair_t from, pair_t to, uint16_t next[])
 {
   /* Currently assumes that monsters only move on floors.  Will *
    * need to be modified for tunneling and pass-wall monsters.  */
@@ -61,12 +61,8 @@ void dijkstra(dungeon_t *d, pair_t from, pair_t to)
     p->hn = NULL;
 
     if ((p->pos[dim_y] == to[dim_y]) && p->pos[dim_x] == to[dim_x]) {
-      for (x = to[dim_x], y = to[dim_y];
-           (x != from[dim_x]) || (y != from[dim_y]);
-           p = &path[y][x], x = p->from[dim_x], y = p->from[dim_y]) {
-        mapxy(x, y) = ter_debug;
-      }
-      mappair(from) = ter_debug;
+      next[0] = p->from[dim_x];
+      next[1] = p->from[dim_y];
 
       heap_delete(&h);
       return;

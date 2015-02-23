@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
     }
 
     render_dungeon(&d);
-    usleep(20000);
+    usleep(100000);
   }
 
   if (do_store) {

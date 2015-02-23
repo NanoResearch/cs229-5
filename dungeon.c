@@ -6,11 +6,13 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <limits.h>
+#include <math.h>
 
 #include "dungeon.h"
 #include "character.h"
 #include "utils.h"
 #include "heap.h"
+#include "move.h"
 
 /* Adds a "room shrinking" phase if it has trouble placing all the rooms. *
  * This allows rooms to become smaller than are specified in the problem  *
@@ -500,6 +502,8 @@ int gen_characters(dungeon_t *d)
     set_character_start_pos(d, i);
     d->chars[i].npc.smart = rand_range(0, 1);
     d->chars[i].npc.tele = rand_range(0, 1);
+    // d->chars[i].npc.smart = 1;
+    // d->chars[i].npc.tele = 0;
   }
 
   return 0;
@@ -549,10 +553,52 @@ int move_npc(dungeon_t *d, uint32_t char_num)
 {
   int i, delta[2], new_pos[2];
 
-  while (1)
+  // smart and tele
+  if (d->chars[char_num].npc.tele == 1 && d->chars[char_num].npc.smart == 1)
   {
-    delta[0] = rand_range(-1, 1);
-    delta[1] = rand_range(-1, 1);
+    pair_t from, to;
+    uint16_t next[2];
+
+    from[dim_x] = d->chars[0].pos[0];
+    from[dim_y] = d->chars[0].pos[1];
+
+    to[dim_x] = d->chars[char_num].pos[0];
+    to[dim_y] = d->chars[char_num].pos[1];
+
+    dijkstra(d, from, to, next);
+
+    d->chars[char_num].pos[0] = next[dim_x];
+    d->chars[char_num].pos[1] = next[dim_y];
+  }
+
+  // dumb and tele
+  else if (d->chars[char_num].npc.tele == 1 && d->chars[char_num].npc.smart == 0)
+  {
+    if (d->chars[char_num].pos[0] < d->chars[0].pos[0])
+    {
+      delta[0] = 1;
+    }
+    else if (d->chars[char_num].pos[0] > d->chars[0].pos[0])
+    {
+      delta[0] = -1;
+    }
+    else
+    {
+      delta[0] = 0;
+    }
+
+    if (d->chars[char_num].pos[1] < d->chars[0].pos[1])
+    {
+      delta[1] = 1;
+    }
+    else if (d->chars[char_num].pos[1] > d->chars[0].pos[1])
+    {
+      delta[1] = -1;
+    }
+    else
+    {
+      delta[1] = 0;
+    }
 
     new_pos[0] = d->chars[char_num].pos[0] + delta[0];
     new_pos[1] = d->chars[char_num].pos[1] + delta[1];
@@ -567,7 +613,84 @@ int move_npc(dungeon_t *d, uint32_t char_num)
       {
         d->chars[char_num].pos[0] = new_pos[0];
         d->chars[char_num].pos[1] = new_pos[1];
-        break;
+      }
+    }
+  }
+
+  // smart and not tele
+  else if (d->chars[char_num].npc.tele == 0 && d->chars[char_num].npc.smart == 1)
+  {
+    int dist;
+    dist = sqrt((d->chars[char_num].pos[0] - d->chars[0].pos[0]) * (d->chars[char_num].pos[0] - d->chars[0].pos[0]) +
+                (d->chars[char_num].pos[1] - d->chars[0].pos[1]) * (d->chars[char_num].pos[1] - d->chars[0].pos[1]));
+
+    if (dist <= VISUAL_RANGE)
+    {
+      pair_t from, to;
+      uint16_t next[2];
+
+      from[dim_x] = d->chars[0].pos[0];
+      from[dim_y] = d->chars[0].pos[1];
+
+      to[dim_x] = d->chars[char_num].pos[0];
+      to[dim_y] = d->chars[char_num].pos[1];
+
+      dijkstra(d, from, to, next);
+
+      d->chars[char_num].pos[0] = next[dim_x];
+      d->chars[char_num].pos[1] = next[dim_y];
+    }
+  }
+
+  // dumb and not tele
+  else
+  {
+    int dist;
+    dist = sqrt((d->chars[char_num].pos[0] - d->chars[0].pos[0]) * (d->chars[char_num].pos[0] - d->chars[0].pos[0]) +
+                (d->chars[char_num].pos[1] - d->chars[0].pos[1]) * (d->chars[char_num].pos[1] - d->chars[0].pos[1]));
+
+    if (dist <= VISUAL_RANGE)
+    {
+      if (d->chars[char_num].pos[0] < d->chars[0].pos[0])
+      {
+        delta[0] = 1;
+      }
+      else if (d->chars[char_num].pos[0] > d->chars[0].pos[0])
+      {
+        delta[0] = -1;
+      }
+      else
+      {
+        delta[0] = 0;
+      }
+
+      if (d->chars[char_num].pos[1] < d->chars[0].pos[1])
+      {
+        delta[1] = 1;
+      }
+      else if (d->chars[char_num].pos[1] > d->chars[0].pos[1])
+      {
+        delta[1] = -1;
+      }
+      else
+      {
+        delta[1] = 0;
+      }
+
+      new_pos[0] = d->chars[char_num].pos[0] + delta[0];
+      new_pos[1] = d->chars[char_num].pos[1] + delta[1];
+
+      if (new_pos[0] >= 0 && new_pos[0] < DUNGEON_X &&
+          new_pos[1] >= 0 && new_pos[1] < DUNGEON_Y)
+      {
+        if (   d->map[new_pos[1]][new_pos[0]] == ter_floor
+            || d->map[new_pos[1]][new_pos[0]] == ter_floor_room
+            || d->map[new_pos[1]][new_pos[0]] == ter_floor_hall
+            || d->map[new_pos[1]][new_pos[0]] == ter_floor_tentative)
+        {
+          d->chars[char_num].pos[0] = new_pos[0];
+          d->chars[char_num].pos[1] = new_pos[1];
+        }
       }
     }
   }
@@ -578,15 +701,17 @@ int move_npc(dungeon_t *d, uint32_t char_num)
     // skip characters that aren't alive or if it is itself
     if (d->chars[i].alive == 1 && i != char_num)
     {
-      if (new_pos[0] == d->chars[i].pos[0] && new_pos[1] == d->chars[i].pos[1])
+      if (d->chars[char_num].pos[0] == d->chars[i].pos[0] && d->chars[char_num].pos[1] == d->chars[i].pos[1])
       {
         d->chars[i].alive = 0;
 
         // pc killed
         if (i == 0)
         {
+          d->chars[i].alive = 1;
           return 1;
         }
+
         // monster killed
         else
         {
