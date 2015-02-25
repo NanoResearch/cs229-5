@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "heap.h"
 #include "dungeon.h"
 #include "utils.h"
 #include "move.h"
@@ -18,6 +19,10 @@ static void usage(char *name)
   exit(-1);
 }
 
+static int32_t turn_cmp(const void *key, const void *with) {
+  return ((character_t *) key)->turn - ((character_t *) with)->turn;
+}
+
 int main(int argc, char *argv[])
 {
   dungeon_t d;
@@ -28,6 +33,7 @@ int main(int argc, char *argv[])
   uint32_t do_load, do_store, do_seed;
   uint32_t long_arg;
   char *save_file;
+  // uint32_t game_turn = 0;
 
   /* Default behavior: Seed with the time, generate a new dungeon, *
    * and don't write to disk.                                      */
@@ -117,7 +123,8 @@ int main(int argc, char *argv[])
     read_dungeon(&d, save_file);
   } else {
     gen_dungeon(&d);
-    gen_characters(&d);
+    heap_init(&d.turn_list, turn_cmp, NULL);
+    gen_characters(&d, &d.turn_list);
   }
 
   render_dungeon(&d);
@@ -131,14 +138,19 @@ int main(int argc, char *argv[])
       {
         if (char_num == 0)
         {
-          move_pc(&d);
+          if (move_pc(&d) == 1)
+          {
+            render_dungeon(&d);
+            printf("\nGame over. PC killed all the monsters\n");
+            return 0;
+          }
         }
         else
         {
           if (move_npc(&d, char_num) == 1)
           {
             render_dungeon(&d);
-            printf("\nGame over. PC Killed.\n");
+            printf("\nGame over. PC killed.\n");
             return 0;
           }
         }
@@ -148,6 +160,28 @@ int main(int argc, char *argv[])
     render_dungeon(&d);
     usleep(100000);
   }
+
+
+  // TODO: Implement turn list using heap
+  // character_t *character = heap_peek_min(&d.turn_list);
+
+  // while (1)
+  // {
+  //   character = heap_peek_min(&d.turn_list);
+  //   if (character->turn == game_turn)
+  //   {
+  //     character = heap_remove_min(&d.turn_list);
+  //     if (character->char_num == 0)
+  //     {
+  //       move_pc(&d);
+  //       heap_insert(&d)
+  //     }
+  //     else
+  //     {
+  //       move_npc(&d, character->char_num);
+  //     }
+  //   }
+  // }
 
   if (do_store) {
     write_dungeon(&d);

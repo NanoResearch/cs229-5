@@ -483,7 +483,7 @@ int set_character_start_pos(dungeon_t *d, uint32_t char_num)
   return 0;
 }
 
-int gen_characters(dungeon_t *d)
+int gen_characters(dungeon_t *d, heap_t *q)
 {
   int i;
 
@@ -492,6 +492,13 @@ int gen_characters(dungeon_t *d)
   d->chars[0].symbol = '@';
   d->chars[0].speed = PC_SPEED;
   set_character_start_pos(d, 0);
+  d->chars[0].turn = 0;
+
+  uint16_t room_num = rand_range(0, d->num_rooms - 1);
+  d->chars[0].pc.target_pos[0] = d->rooms[room_num].position[dim_x] + rand_range(0, d->rooms[room_num].size[dim_x] - 1);
+  d->chars[0].pc.target_pos[1] = d->rooms[room_num].position[dim_y] + rand_range(0, d->rooms[room_num].size[dim_y] - 1);
+
+  heap_insert(q, &d->chars[0]);
 
   for (i = 1; i < d->num_char; i++)
   {
@@ -500,53 +507,64 @@ int gen_characters(dungeon_t *d)
     d->chars[i].symbol = 'A' + (random() % 26);
     d->chars[i].speed = rand_range(5, 20);
     set_character_start_pos(d, i);
+    d->chars[i].turn = 0;
     d->chars[i].npc.smart = rand_range(0, 1);
     d->chars[i].npc.tele = rand_range(0, 1);
-    // d->chars[i].npc.smart = 1;
-    // d->chars[i].npc.tele = 0;
+
+    heap_insert(q, &d->chars[i]);
   }
 
   return 0;
 }
 
-void move_pc(dungeon_t *d)
+int move_pc(dungeon_t *d)
 {
-  int i, delta[2], new_pos[2];
+  int i, j;
+  pair_t from, to;
+  uint16_t next[2];
 
-  while (1)
+  if (d->chars[0].pos[0] == d->chars[0].pc.target_pos[0] &&
+      d->chars[0].pos[1] == d->chars[0].pc.target_pos[1])
   {
-    delta[0] = rand_range(-1, 1);
-    delta[1] = rand_range(-1, 1);
-
-    new_pos[0] = d->chars[0].pos[0] + delta[0];
-    new_pos[1] = d->chars[0].pos[1] + delta[1];
-
-    if (new_pos[0] >= 0 && new_pos[0] < DUNGEON_X &&
-        new_pos[1] >= 0 && new_pos[1] < DUNGEON_Y)
-    {
-      if (   d->map[new_pos[1]][new_pos[0]] == ter_floor
-          || d->map[new_pos[1]][new_pos[0]] == ter_floor_room
-          || d->map[new_pos[1]][new_pos[0]] == ter_floor_hall
-          || d->map[new_pos[1]][new_pos[0]] == ter_floor_tentative)
-      {
-        d->chars[0].pos[0] = new_pos[0];
-        d->chars[0].pos[1] = new_pos[1];
-        break;
-      }
-    }
+    uint16_t room_num = rand_range(0, d->num_rooms - 1);
+    d->chars[0].pc.target_pos[0] = d->rooms[room_num].position[dim_x] + rand_range(0, d->rooms[room_num].size[dim_x] - 1);
+    d->chars[0].pc.target_pos[1] = d->rooms[room_num].position[dim_y] + rand_range(0, d->rooms[room_num].size[dim_y] - 1);
   }
+
+  from[dim_x] = d->chars[0].pc.target_pos[0];
+  from[dim_y] = d->chars[0].pc.target_pos[1];
+
+  to[dim_x] = d->chars[0].pos[0];
+  to[dim_y] = d->chars[0].pos[1];
+
+  dijkstra(d, from, to, next);
+
+  d->chars[0].pos[0] = next[dim_x];
+  d->chars[0].pos[1] = next[dim_y];
+
+  d->chars[0].turn = (100 / d->chars[0].speed);
 
   for (i = 1; i < d->num_char; i++)
   {
     if (d->chars[i].alive == 1)
     {
-      if (new_pos[0] == d->chars[i].pos[0] && new_pos[1] == d->chars[i].pos[1])
+      if (d->chars[0].pos[0] == d->chars[i].pos[0] && d->chars[0].pos[1] == d->chars[i].pos[1])
       {
         d->chars[i].alive = 0;
-        return;
+
+        for (j = 1; j < d->num_char; j++)
+        {
+          if (d->chars[j].alive == 1)
+          {
+            return 0;
+          }
+        }
+
+        return 1;
       }
     }
   }
+  return 0;
 }
 
 int move_npc(dungeon_t *d, uint32_t char_num)
@@ -569,6 +587,8 @@ int move_npc(dungeon_t *d, uint32_t char_num)
 
     d->chars[char_num].pos[0] = next[dim_x];
     d->chars[char_num].pos[1] = next[dim_y];
+
+    d->chars[char_num].turn = (100 / d->chars[char_num].speed);
   }
 
   // dumb and tele
@@ -613,6 +633,8 @@ int move_npc(dungeon_t *d, uint32_t char_num)
       {
         d->chars[char_num].pos[0] = new_pos[0];
         d->chars[char_num].pos[1] = new_pos[1];
+
+        d->chars[char_num].turn = (100 / d->chars[char_num].speed);
       }
     }
   }
@@ -639,6 +661,8 @@ int move_npc(dungeon_t *d, uint32_t char_num)
 
       d->chars[char_num].pos[0] = next[dim_x];
       d->chars[char_num].pos[1] = next[dim_y];
+
+      d->chars[char_num].turn = (100 / d->chars[char_num].speed);
     }
   }
 
@@ -690,6 +714,8 @@ int move_npc(dungeon_t *d, uint32_t char_num)
         {
           d->chars[char_num].pos[0] = new_pos[0];
           d->chars[char_num].pos[1] = new_pos[1];
+
+          d->chars[char_num].turn = (100 / d->chars[char_num].speed);
         }
       }
     }

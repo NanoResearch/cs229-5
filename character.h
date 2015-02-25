@@ -1,13 +1,15 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
+#include "heap.h"
+
 typedef enum char_type {
   pc,
   npc
 } char_type_t;
 
 typedef struct pc {
-  
+  uint8_t target_pos[2];
 } pc_t;
 
 typedef struct npc {
@@ -16,6 +18,8 @@ typedef struct npc {
 } npc_t;
 
 typedef struct character {
+  heap_node_t *hn;
+  uint32_t char_num;
   uint32_t alive;
   char_type_t type;
   pc_t pc;
@@ -23,6 +27,7 @@ typedef struct character {
   char symbol;
   uint8_t speed;
   uint16_t pos[2];
+  uint32_t turn;
 } character_t;
 
 #endif

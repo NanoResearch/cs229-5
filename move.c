@@ -133,3 +133,8 @@ void dijkstra(dungeon_t *d, pair_t from, pair_t to, uint16_t next[])
     }
   }
 }
+
+void move_character(dungeon_t dungeon, uint32_t char_num)
+{
+
+}
