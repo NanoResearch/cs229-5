@@ -1,0 +1,38 @@
+==========
+CHANGELOG
+==========
+
+Note: Because this assignment builds upon the professors submitted solution, this log begins at the
+      start of this assignment.
+
+2-20-2015
+=========
+Add starter files
+remove generated files
+add changlog and readme files. Ready to begin work.
+
+2-21-2015
+=========
+add character.c and header files
+set given number of monsters plus pc to initial dungeon character count
+remove unneeded code
+add character info to dungeon struct
+
+2-22-2015
+=========
+setup character struct
+character generation works using set character start pos and generate character functions
+cleanup
+add characters to render dungeon functionsmake the pc move around the dungeon randomly
+make the sleep longer
+pc's and npc's now randomly move around and kill each other
+
+2-23-2015
+=========
+There are now 4 types of monsters
+The pc now randomly walks the whole dungeon
+
+2-14-2015
+=========
+working on tuen queue
+update make file, changelog, readme
