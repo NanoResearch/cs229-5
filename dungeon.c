@@ -460,32 +460,33 @@ int gen_dungeon(dungeon_t *d)
 void render_dungeon(dungeon_t *d)
 {
   pair_t p;
+  char c;
 
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
       if (d->character[p[dim_y]][p[dim_x]]) {
-        putchar(d->character[p[dim_y]][p[dim_x]]->symbol);
+        c = d->character[p[dim_y]][p[dim_x]]->symbol;
       } else {
         switch (mappair(p)) {
         case ter_wall:
         case ter_wall_no_room:
         case ter_wall_no_floor:
         case ter_wall_immutable:
-          putchar('#');
+          c = '#';
           break;
         case ter_floor:
         case ter_floor_room:
         case ter_floor_hall:
         case ter_floor_tentative:
-          putchar('.');
+          c = '.';
           break;
         case ter_debug:
-          putchar('*');
+          c = '*';
           break;
         }
       }
+      mvaddch(p[dim_y], p[dim_x], c);
     }
-    putchar('\n');
   }
   /*
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
