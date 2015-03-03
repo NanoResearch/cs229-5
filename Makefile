@@ -3,10 +3,10 @@ ECHO = echo
 RM = rm -f
 
 CFLAGS = -Wall -Werror -ggdb
-LDFLAGS = 
+LDFLAGS = -lncurses
 
 BIN = rlg229
-OBJS = rlg229.o dungeon.o move.o utils.o heap.o character.o pc.o npc.o
+OBJS = rlg229.o dungeon.o move.o utils.o heap.o character.o pc.o npc.o input.o
 
 all: $(BIN) etags
 
