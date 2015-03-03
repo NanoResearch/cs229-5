@@ -180,7 +180,7 @@ void do_moves(dungeon_t *d)
     c->next_turn += (100 / c->speed);
 
     if (c == d->pc) {
-      pc_next_pos(d, next);
+      get_input_terminal(d, next);
       next[dim_x] += c->position[dim_x];
       next[dim_y] += c->position[dim_y];
       if (mappair(next) <= ter_floor) {
