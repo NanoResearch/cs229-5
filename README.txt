@@ -2,20 +2,22 @@
 ||  README  ||
 ==============
 
-This program follows all rules set forth by the assignment PDF. It creates a
-randomly generated dungeon with 12 room of varying sizes. All rooms are
-connected by cooridors. The program also has the ability to save and load
-previously created dungeons using the parameters '--save' and/or '--load'.
+This program satisfies the requirement of moving the pc around in the dungeon and leaving the game.
 
 /*
- * Function:    save_dungeon
+ * Function:    io_init_terminal
  * -----------------------------
- * Saves a binary dungeon in the .rlg229 directory in the users HOME folder
- * as a file called dungeon.
+ * initializes the ncurses services used in the game.
  */
 
  /*
- * Function:    load_dungeon
+ * Function:    io_kill_terminal
  * -----------------------------
- * Loads the dungeon from its save file in the .rlg229 folder.
+ * Kills the ncurses services used in the game.
+ */
+
+/*
+ * Function:    get_input_terminal
+ * --------------------------------
+ * Gets input from the user and processes it.
  */
