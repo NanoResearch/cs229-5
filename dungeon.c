@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <limits.h>
+#include <ncurses.h>
 
 #include "dungeon.h"
 #include "utils.h"
