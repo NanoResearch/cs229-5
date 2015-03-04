@@ -464,8 +464,43 @@ void render_dungeon(dungeon_t *d)
   char c;
 
   clear();
-  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
-    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
+
+  int start_x, end_x, start_y, end_y;
+
+  if (d->pc->position[dim_x] - 40 < 0)
+  {
+    start_x = 0;
+    end_x = 80;
+  }
+  else if (d->pc->position[dim_x] + 40 > DUNGEON_X)
+  {
+    start_x = DUNGEON_X - 80;
+    end_x = DUNGEON_X;
+  }
+  else
+  {
+    start_x = d->pc->position[dim_x] - 40;
+    end_x = d->pc->position[dim_x] + 40;
+  }
+
+  if (d->pc->position[dim_y] - 12 < 0)
+  {
+    start_y = 0;
+    end_y = 24;
+  }
+  else if (d->pc->position[dim_y] + 12 > DUNGEON_Y)
+  {
+    start_y = DUNGEON_Y - 24;
+    end_y = DUNGEON_Y;
+  }
+  else
+  {
+    start_y = d->pc->position[dim_y] - 12;
+    end_y = d->pc->position[dim_y] + 12;
+  }
+  
+  for (p[dim_y] = start_y; p[dim_y] < end_y; p[dim_y]++) {
+    for (p[dim_x] = start_x; p[dim_x] < end_x; p[dim_x]++) {
       if (d->character[p[dim_y]][p[dim_x]]) {
         c = d->character[p[dim_y]][p[dim_x]]->symbol;
       } else {
@@ -487,7 +522,7 @@ void render_dungeon(dungeon_t *d)
           break;
         }
       }
-      mvaddch(p[dim_y], p[dim_x], c);
+      mvaddch(p[dim_y] - start_y, p[dim_x] - start_x, c);
     }
   }
   /*
