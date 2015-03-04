@@ -462,6 +462,7 @@ void render_dungeon(dungeon_t *d)
   pair_t p;
   char c;
 
+  clear();
   for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
     for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
       if (d->character[p[dim_y]][p[dim_x]]) {
@@ -500,6 +501,7 @@ void render_dungeon(dungeon_t *d)
     printf("\n");
   }
   */
+  refresh();
 }
 
 static int write_dungeon_map(dungeon_t *d, FILE *f)
