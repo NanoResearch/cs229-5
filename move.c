@@ -6,6 +6,7 @@
 #include "npc.h"
 #include "pc.h"
 #include "character.h"
+#include "input.h"
 
 /* Ugly hack: There is no way to pass a pointer to the dungeon into the *
  * heap's comparitor funtion without modifying the heap.  Copying the   *
