@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ncurses.h>
 
 #include "dungeon.h"
 #include "character.h"
@@ -10,6 +11,7 @@
 #include "pc.h"
 #include "npc.h"
 #include "move.h"
+#include "input.h"
 
 static void usage(char *name)
 {
@@ -123,12 +125,14 @@ int main(int argc, char *argv[])
   config_pc(&d);
   gen_monsters(&d, nummon);
 
+  io_init_terminal();
+
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
     render_dungeon(&d);
     do_moves(&d);
-    usleep(125000);
   }
-  render_dungeon(&d);
+
+  io_kill_terminal();
 
   if (pc_is_alive(&d)) {
     printf("%s says, \"%s\"\n", d.pc->pc->name, d.pc->pc->catch_phrase);
