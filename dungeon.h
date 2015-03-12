@@ -6,6 +6,7 @@
 
 # include "heap.h"
 # include "dims.h"
+# include "character.h"
 
 #define DUNGEON_X              160
 #define DUNGEON_Y              96
@@ -36,7 +37,10 @@ typedef enum __attribute__ ((__packed__)) terrain_type {
   ter_floor,
   ter_floor_room,
   ter_floor_hall,
-  ter_floor_tentative
+  ter_floor_tentative,
+  ter_stairs,
+  ter_stairs_up,
+  ter_stairs_down
 } terrain_type_t;
 
 typedef struct room {
@@ -64,14 +68,20 @@ typedef struct dungeon {
    * of overhead to the memory system.                                    */
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
   uint16_t num_monsters;
+  uint32_t character_sequence_number;
   character_t *character[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   /* pc can be statically allocated; however, that lead to special cases *
    * for the deallocator when cleaning up our turn queue.  Making it     *
    * dynamic simplifies the logic at the expense of one level of         *
    * indirection.                                                        */
-  character_t *pc;
+  /* Changed my mind.  Make it an instance because there are special     *
+   * cases for it no matter what.                                        */
+  character_t pc;
   heap_t next_turn;
+  pair_t io_offset;
+  uint32_t save_and_exit;
+  uint32_t quit_no_save;
 } dungeon_t;
 
 int read_dungeon(dungeon_t *dungeon, char *filename);
@@ -80,5 +90,6 @@ void render_dungeon(dungeon_t *dungeon);
 int write_dungeon(dungeon_t *dungeon);
 void init_dungeon(dungeon_t *d);
 void delete_dungeon(dungeon_t *d);
+void new_dungeon(dungeon_t *d);
 
 #endif

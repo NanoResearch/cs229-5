@@ -6,27 +6,41 @@
 #include "pc.h"
 #include "dungeon.h"
 
+char *print_character(const void *v)
+{
+  const character_t *c = v;
+
+  static char string[80];
+
+  snprintf(string, 80, "%d:%d", c->next_turn, c->sequence_number);
+
+  return string;
+}
+
 void character_delete(void *v)
 {
+  /* The PC is never malloc()ed anymore, do don't attempt to free it here. */
   character_t *c;
 
-  c = v;
+  if (v) {
+    c = v;
 
-  if (c->npc) {
-    npc_delete(c->npc);
+    if (c->npc) {
+      npc_delete(c->npc);
+      free(c);
+    }
   }
-  if (c->pc) {
-    pc_delete(c->pc);
-  }
-
-  free(c);
 }
 
 int32_t compare_characters_by_next_turn(const void *character1,
                                         const void *character2)
 {
-  return (((character_t *) character1)->next_turn -
+  int32_t diff;
+
+  diff = (((character_t *) character1)->next_turn -
           ((character_t *) character2)->next_turn);
+  return diff ? diff : (((character_t *) character1)->sequence_number -
+                        ((character_t *) character2)->sequence_number);
 }
 
 uint32_t can_see(dungeon_t *d, character_t *voyeur, character_t *exhibitionist)

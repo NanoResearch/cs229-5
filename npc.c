@@ -7,10 +7,12 @@
 
 void npc_delete(npc_t *n)
 {
-  free(n);
+  if (n) {
+    free(n);
+  }
 }
 
-void gen_monsters(dungeon_t *d, uint32_t nummon)
+void gen_monsters(dungeon_t *d, uint32_t nummon, uint32_t game_turn)
 {
   character_t *m;
   uint32_t room;
@@ -35,14 +37,13 @@ void gen_monsters(dungeon_t *d, uint32_t nummon)
     m->position[dim_x] = p[dim_x];
     d->character[p[dim_y]][p[dim_x]] = m;
     m->speed = rand_range(5, 20);
-    m->next_turn = 0;
+    m->next_turn = game_turn;
     m->alive = 1;
+    m->sequence_number = ++d->character_sequence_number;
     m->pc = NULL;
     m->npc = malloc(sizeof (*m->npc));
     m->npc->characteristics = rand();
     m->npc->have_seen_pc = 0;
-    m->npc->pc_last_known_position[dim_x] =
-      m->npc->pc_last_known_position[dim_y] = 0;
 
     d->character[p[dim_y]][p[dim_x]] = m;
 
@@ -86,8 +87,8 @@ void npc_next_pos_line_of_sight(dungeon_t *d, character_t *c, pair_t next)
 {
   pair_t dir;
 
-  dir[dim_y] = d->pc->position[dim_y] - c->position[dim_y];
-  dir[dim_x] = d->pc->position[dim_x] - c->position[dim_x];
+  dir[dim_y] = d->pc.position[dim_y] - c->position[dim_y];
+  dir[dim_x] = d->pc.position[dim_x] - c->position[dim_x];
   if (dir[dim_y]) {
     dir[dim_y] /= abs(dir[dim_y]);
   }
@@ -161,18 +162,18 @@ void npc_next_pos(dungeon_t *d, character_t *c, pair_t next)
 
   switch (c->npc->characteristics & (NPC_SMART | NPC_TELEPATH)) {
   case 0:
-    if (can_see(d, c, d->pc)) {
-      c->npc->pc_last_known_position[dim_y] = d->pc->position[dim_y];
-      c->npc->pc_last_known_position[dim_x] = d->pc->position[dim_x];
+    if (can_see(d, c, &d->pc)) {
+      c->npc->pc_last_known_position[dim_y] = d->pc.position[dim_y];
+      c->npc->pc_last_known_position[dim_x] = d->pc.position[dim_x];
       npc_next_pos_line_of_sight(d, c, next);
     } else {
       npc_next_pos_rand(d, c, next);
     }
     break;
   case NPC_SMART:
-    if (can_see(d, c, d->pc)) {
-      c->npc->pc_last_known_position[dim_y] = d->pc->position[dim_y];
-      c->npc->pc_last_known_position[dim_x] = d->pc->position[dim_x];
+    if (can_see(d, c, &d->pc)) {
+      c->npc->pc_last_known_position[dim_y] = d->pc.position[dim_y];
+      c->npc->pc_last_known_position[dim_x] = d->pc.position[dim_x];
       c->npc->have_seen_pc = 1;
     } else if ((c->npc->pc_last_known_position[dim_y] == c->position[dim_y]) &&
                (c->npc->pc_last_known_position[dim_x] == c->position[dim_x])) {
@@ -186,8 +187,8 @@ void npc_next_pos(dungeon_t *d, character_t *c, pair_t next)
     /* We could implement a "toward pc" movement function, but this works *
      * just as well, since the line of sight calculations are down        *
      * outside of the next position function.                             */
-    c->npc->pc_last_known_position[dim_y] = d->pc->position[dim_y];
-    c->npc->pc_last_known_position[dim_x] = d->pc->position[dim_x];
+    c->npc->pc_last_known_position[dim_y] = d->pc.position[dim_y];
+    c->npc->pc_last_known_position[dim_x] = d->pc.position[dim_x];
     npc_next_pos_line_of_sight(d, c, next);      
     break;
   case NPC_SMART | NPC_TELEPATH:

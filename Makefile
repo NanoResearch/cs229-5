@@ -6,7 +6,7 @@ CFLAGS = -Wall -Werror -ggdb
 LDFLAGS = -lncurses
 
 BIN = rlg229
-OBJS = rlg229.o dungeon.o move.o utils.o heap.o character.o pc.o npc.o input.o
+OBJS = rlg229.o dungeon.o move.o utils.o heap.o character.o pc.o npc.o io.o
 
 all: $(BIN) etags
 

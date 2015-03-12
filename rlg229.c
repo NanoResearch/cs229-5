@@ -3,7 +3,6 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <ncurses.h>
 
 #include "dungeon.h"
 #include "character.h"
@@ -11,8 +10,7 @@
 #include "pc.h"
 #include "npc.h"
 #include "move.h"
-#include "input.h"
-
+#include "io.h"
 static void usage(char *name)
 {
   fprintf(stderr,
@@ -46,7 +44,7 @@ int main(int argc, char *argv[])
    * don't run out of letters).  For now, we've got plenty.  Long   *
    * forms use whole words and take two dashes.  Short forms use an *
    * abbreviation after a single dash.  We'll add '--rand' (to      *
-   * specify a random seed), which will take an argument of it's    *
+   * specify a random seed), which will take an argument of its     *
    * own, and we'll add short forms for all three commands, '-l',   *
    * '-s', and '-r', respectively.  We're also going to allow an    *
    * optional argument to load to allow us to load non-default save *
@@ -114,6 +112,7 @@ int main(int argc, char *argv[])
   printf("Seed is %ld.\n", seed);
   srand(seed);
 
+  io_init_terminal();
   init_dungeon(&d);
 
   if (do_load) {
@@ -123,19 +122,24 @@ int main(int argc, char *argv[])
   }
 
   config_pc(&d);
-  gen_monsters(&d, nummon);
+  gen_monsters(&d, nummon, 0);
 
-  io_init_terminal();
-
-  while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
-    render_dungeon(&d);
+  io_display(&d);
+  while (pc_is_alive(&d) && dungeon_has_npcs(&d) &&
+         !(d.save_and_exit || d.quit_no_save)) {
     do_moves(&d);
+    io_display(&d);
+    if (!pc_is_alive(&d)) {
+      break;
+    }
+    io_handle_input(&d);
   }
+  io_display(&d);
 
-  io_kill_terminal();
+  io_reset_terminal();
 
   if (pc_is_alive(&d)) {
-    printf("%s says, \"%s\"\n", d.pc->pc->name, d.pc->pc->catch_phrase);
+    printf("%s says, \"%s\"\n", d.pc.pc->name, d.pc.pc->catch_phrase);
   } else {
     printf("The monster hordes growl menacingly.\n");
   }
@@ -144,6 +148,7 @@ int main(int argc, char *argv[])
     write_dungeon(&d);
   }
 
+  pc_delete(d.pc.pc);
   delete_dungeon(&d);
 
   return 0;

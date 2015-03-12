@@ -6,12 +6,14 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <limits.h>
-#include <ncurses.h>
 
 #include "dungeon.h"
 #include "utils.h"
 #include "character.h"
 #include "heap.h"
+#include "io.h"
+#include "pc.h"
+#include "npc.h"
 
 /* Adds a "room shrinking" phase if it has trouble placing all the rooms. *
  * This allows rooms to become smaller than are specified in the problem  *
@@ -433,6 +435,28 @@ static int empty_dungeon(dungeon_t *d)
   return 0;
 }
 
+static void place_stairs(dungeon_t *d)
+{
+  pair_t p;
+  do {
+    while ((p[dim_y] = rand_range(1, DUNGEON_Y - 2)) &&
+           (p[dim_x] = rand_range(1, DUNGEON_X - 2)) &&
+           ((mappair(p) < ter_floor)                 ||
+            (mappair(p) > ter_stairs)))
+      ;
+    mappair(p) = ter_stairs_down;
+  } while (rand_under(1, 3));
+  do {
+    while ((p[dim_y] = rand_range(1, DUNGEON_Y - 2)) &&
+           (p[dim_x] = rand_range(1, DUNGEON_X - 2)) &&
+           ((mappair(p) < ter_floor)                 ||
+            (mappair(p) > ter_stairs)))
+      
+      ;
+    mappair(p) = ter_stairs_up;
+  } while (rand_under(1, 4));
+}
+
 int gen_dungeon(dungeon_t *d)
 {
   /*
@@ -454,90 +478,9 @@ int gen_dungeon(dungeon_t *d)
   make_rooms(d);
   place_rooms(d);
   connect_rooms(d);
+  place_stairs(d);
 
   return 0;
-}
-
-void render_dungeon(dungeon_t *d)
-{
-  pair_t p;
-  char c;
-
-  clear();
-
-  int start_x, end_x, start_y, end_y;
-
-  if (d->pc->position[dim_x] - 40 < 0)
-  {
-    start_x = 0;
-    end_x = 80;
-  }
-  else if (d->pc->position[dim_x] + 40 > DUNGEON_X)
-  {
-    start_x = DUNGEON_X - 80;
-    end_x = DUNGEON_X;
-  }
-  else
-  {
-    start_x = d->pc->position[dim_x] - 40;
-    end_x = d->pc->position[dim_x] + 40;
-  }
-
-  if (d->pc->position[dim_y] - 12 < 0)
-  {
-    start_y = 0;
-    end_y = 24;
-  }
-  else if (d->pc->position[dim_y] + 12 > DUNGEON_Y)
-  {
-    start_y = DUNGEON_Y - 24;
-    end_y = DUNGEON_Y;
-  }
-  else
-  {
-    start_y = d->pc->position[dim_y] - 12;
-    end_y = d->pc->position[dim_y] + 12;
-  }
-  
-  for (p[dim_y] = start_y; p[dim_y] < end_y; p[dim_y]++) {
-    for (p[dim_x] = start_x; p[dim_x] < end_x; p[dim_x]++) {
-      if (d->character[p[dim_y]][p[dim_x]]) {
-        c = d->character[p[dim_y]][p[dim_x]]->symbol;
-      } else {
-        switch (mappair(p)) {
-        case ter_wall:
-        case ter_wall_no_room:
-        case ter_wall_no_floor:
-        case ter_wall_immutable:
-          c = '#';
-          break;
-        case ter_floor:
-        case ter_floor_room:
-        case ter_floor_hall:
-        case ter_floor_tentative:
-          c = '.';
-          break;
-        case ter_debug:
-          c = '*';
-          break;
-        }
-      }
-      mvaddch(p[dim_y] - start_y, p[dim_x] - start_x, c);
-    }
-  }
-  /*
-  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
-    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
-      if (mappair(p) < ter_floor) {
-        printf("##");
-      } else {
-        printf("%02hhx", d->pc_distance[p[dim_y]][p[dim_x]]);
-      }
-    }
-    printf("\n");
-  }
-  */
-  refresh();
 }
 
 static int write_dungeon_map(dungeon_t *d, FILE *f)
@@ -831,10 +774,35 @@ int read_dungeon(dungeon_t *d, char *file)
 void delete_dungeon(dungeon_t *d)
 {
   heap_delete(&d->next_turn);
+  memset(d->character, 0, sizeof (d->character));
 }
 
 void init_dungeon(dungeon_t *d)
 {
   empty_dungeon(d);
+  d->save_and_exit = d->quit_no_save = 0;
   heap_init(&d->next_turn, compare_characters_by_next_turn, character_delete);
+}
+
+void new_dungeon(dungeon_t *d)
+{
+  uint32_t sequence_number;
+
+  sequence_number = d->character_sequence_number;
+
+  delete_dungeon(d);
+
+  init_dungeon(d);
+  gen_dungeon(d);
+  d->character_sequence_number = sequence_number;
+
+  place_pc(d);
+  d->character[d->pc.position[dim_y]][d->pc.position[dim_x]] = &d->pc;
+  io_calculate_offset(d);
+
+  /* Need to add a mechanism to decide on a number of monsters.  --nummon  *
+   * is just for testing, and if we're generating new dungeon levels, then *
+   * presumably we've already done that testing.  We'll just put 10 in for *
+   * now.                                                                  */
+  gen_monsters(d, 10, d->pc.next_turn);
 }

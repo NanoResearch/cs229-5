@@ -6,7 +6,7 @@
 #include "npc.h"
 #include "pc.h"
 #include "character.h"
-#include "input.h"
+#include "io.h"
 
 /* Ugly hack: There is no way to pass a pointer to the dungeon into the *
  * heap's comparitor funtion without modifying the heap.  Copying the   *
@@ -22,21 +22,6 @@ typedef struct path {
   heap_node_t *hn;
   uint8_t pos[2];
 } path_t;
-
-void next_move(dungeon_t *d,
-               character_t *c,
-               pair_t goal_pos,
-               pair_t next_pos)
-{
-  if ((goal_pos[dim_x] == c->position[dim_x]) &&
-      (goal_pos[dim_y] == c->position[dim_y])) {
-    next_pos[dim_x] = goal_pos[dim_x];
-    next_pos[dim_y] = goal_pos[dim_y];
-  }
-  
-  if (has_characteristic(c, SMART)) {
-  }
-}
 
 static int32_t dist_cmp(const void *key, const void *with) {
   return ((int32_t) dungeon->pc_distance[((path_t *) key)->pos[dim_y]]
@@ -71,7 +56,7 @@ void dijkstra(dungeon_t *d)
       d->pc_distance[y][x] = 255;
     }
   }
-  d->pc_distance[d->pc->position[dim_y]][d->pc->position[dim_x]] = 0;
+  d->pc_distance[d->pc.position[dim_y]][d->pc.position[dim_x]] = 0;
 
   heap_init(&h, dist_cmp, NULL);
 
@@ -153,57 +138,55 @@ void dijkstra(dungeon_t *d)
   heap_delete(&h);
 }
 
+void move_character(dungeon_t *d, character_t *c, pair_t next)
+{
+  d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
+  c->position[dim_y] = next[dim_y];
+  c->position[dim_x] = next[dim_x];
+  if (d->character[c->position[dim_y]][c->position[dim_x]]) {
+    d->character[c->position[dim_y]][c->position[dim_x]]->alive = 0;
+    if (d->character[c->position[dim_y]][c->position[dim_x]] != &d->pc) {
+      d->num_monsters--;
+    }
+  }
+  d->character[c->position[dim_y]][c->position[dim_x]] = c;
+}
+
 void do_moves(dungeon_t *d)
 {
   pair_t next;
   character_t *c;
-  uint32_t pc_dead;
 
-  pc_dead = 0;
+  /* Remove the PC when it is PC turn.  Replace on next call.  This allows *
+   * use to completely uninit the heap when generating a new level without *
+   * worrying about deleting the PC.                                       */
 
-  do {
-    c = heap_remove_min(&d->next_turn);
+  if (pc_is_alive(d)) {
+    heap_insert(&d->next_turn, &d->pc);
+  }
 
+  while (pc_is_alive(d) && ((c = heap_remove_min(&d->next_turn)) != &d->pc)) {
     if (!c->alive) {
-      if (c == d->pc) {
-        pc_dead = 1;
-        d->pc = NULL;
+      if (d->character[c->position[dim_y]][c->position[dim_x]] == c) {
+        d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
       }
-      character_delete(c);
-
-      if (pc_dead) {
-        break;
+      if (c != &d->pc) {
+        character_delete(c);
       }
-
       continue;
     }
 
-    c->next_turn += (100 / c->speed);
+    c->next_turn += (1000 / c->speed);
 
-    if (c == d->pc) {
-      get_input_terminal(d, next);
-      next[dim_x] += c->position[dim_x];
-      next[dim_y] += c->position[dim_y];
-      if (mappair(next) <= ter_floor) {
-        mappair(next) = ter_floor_hall;
-      }
-    } else {
-      npc_next_pos(d, c, next);
-    }
+    npc_next_pos(d, c, next);
+    move_character(d, c, next);
 
-    d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
-    c->position[dim_y] = next[dim_y];
-    c->position[dim_x] = next[dim_x];
-    if (d->character[c->position[dim_y]][c->position[dim_x]]) {
-      d->character[c->position[dim_y]][c->position[dim_x]]->alive = 0;
-      d->num_monsters--;
-    }
-    d->character[c->position[dim_y]][c->position[dim_x]] = c;
-    if (c == d->pc) {
-      dijkstra(d);
-    }
     heap_insert(&d->next_turn, c);
-  } while (heap_peek_min(&d->next_turn) != d->pc);
+  }
+
+  if (pc_is_alive(d) && c == &d->pc) {
+    c->next_turn += (1000 / c->speed);
+  }
 }
 
 void dir_nearest_wall(dungeon_t *d, character_t *c, pair_t dir)
@@ -234,4 +217,86 @@ uint32_t in_corner(dungeon_t *d, character_t *c)
                           c->position[dim_y] + 1) == ter_wall_immutable);
 
   return num_immutable > 1;
+}
+
+static void new_dungeon_level(dungeon_t *d, uint32_t dir)
+{
+  /* Eventually up and down will be independantly meaningful. *
+   * For now, simply generate a new dungeon.                  */
+
+  switch (dir) {
+  case '<':
+  case '>':
+    new_dungeon(d);
+    break;
+  default:
+    break;
+  }
+}
+
+uint32_t move_pc(dungeon_t *d, uint32_t dir)
+{
+  pair_t next;
+  uint32_t was_stairs = 0;
+
+  next[dim_y] = d->pc.position[dim_y];
+  next[dim_x] = d->pc.position[dim_x];
+  switch (dir) {
+  case 1:
+  case 2:
+  case 3:
+    next[dim_y]++;
+    break;
+  case 4:
+  case 5:
+  case 6:
+    break;
+  case 7:
+  case 8:
+  case 9:
+    next[dim_y]--;
+    break;
+  }
+  switch (dir) {
+  case 1:
+  case 4:
+  case 7:
+    next[dim_x]--;
+    break;
+  case 2:
+  case 5:
+  case 8:
+    break;
+  case 3:
+  case 6:
+  case 9:
+    next[dim_x]++;
+    break;
+  case '<':
+    if (mappair(d->pc.position) == ter_stairs_up) {
+      was_stairs = 1;
+      new_dungeon_level(d, '<');
+    }
+    break;
+  case '>':
+    if (mappair(d->pc.position) == ter_stairs_down) {
+      was_stairs = 1;
+      new_dungeon_level(d, '>');
+    }
+    break;
+  }
+
+  if (was_stairs) {
+    return 0;
+  }
+
+  if ((dir != '>') && (dir != '<') && (mappair(next) >= ter_floor)) {
+    move_character(d, &d->pc, next);
+    io_update_offset(d);
+    dijkstra(d);
+
+    return 0;
+  }
+
+  return 1;
 }
