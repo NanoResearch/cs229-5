@@ -19,7 +19,7 @@
 #define SAVE_DIR               ".rlg229"
 #define DUNGEON_SAVE_FILE      "dungeon"
 #define DUNGEON_SAVE_SEMANTIC  "RLG229"
-#define DUNGEON_SAVE_VERSION   0U
+#define DUNGEON_SAVE_VERSION   1
 #define VISUAL_RANGE           30
 #define PC_SPEED               10
 
