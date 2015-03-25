@@ -487,6 +487,8 @@ static int write_dungeon_map(dungeon_t *d, FILE *f)
 {
   uint32_t x, y;
   uint8_t zero = 0;
+  uint8_t one = 1;
+  uint8_t two = 2;
   uint8_t non_zero = 1;
   uint32_t found_error;
 
@@ -558,9 +560,20 @@ static int write_dungeon_map(dungeon_t *d, FILE *f)
         fwrite(&zero, sizeof (zero), 1, f);
       }
 
-      /* And the fourth byte is the hardness */
+      /* The fourth byte is the hardness */
       fwrite(&hardnessxy(x, y), sizeof (hardnessxy(x, y)), 1, f);
       
+      /* The fifth byte is 0 if no stairs, one if downward staircase, and two if upward staircase */
+      switch (mapxy(x, y)) {
+      case ter_stairs_up:
+        fwrite(&two, sizeof (two), 1, f);
+        break;
+      case ter_stairs_down:
+        fwrite(&one, sizeof (one), 1, f);
+        break;
+      default:
+        fwrite(&zero, sizeof (zero), 1, f);
+      }
     }
   }
 
@@ -584,9 +597,11 @@ int write_rooms(dungeon_t *d, FILE *f)
 
 uint32_t calculate_dungeon_size(dungeon_t *d)
 {
-  return ((DUNGEON_X * DUNGEON_Y * 4 /* hard-coded value from the spec */)  +
+  return (4 /* Also hard-coded from the spec; offset of the user block, or EOF if no user block */ +
+          (DUNGEON_X * DUNGEON_Y * 5 /* hard-coded value from the spec */)  +
           2 /* Also hard-coded from the spec; storage for the room count */ +
-          (4 /* Also hard-coded, bytes per room */ * d->num_rooms));
+          (4 /* Also hard-coded, bytes per room */ * d->num_rooms) +
+          2 /* Also hard-coded from the spec; position of the pc in the dungeon */);
 }
 
 int write_dungeon(dungeon_t *d)
@@ -631,7 +646,11 @@ int write_dungeon(dungeon_t *d)
   be32 = htobe32(calculate_dungeon_size(d));
   fwrite(&be32, sizeof (be32), 1, f);
 
-  /* The dungeon map, 61440 bytes, 14-61453 */
+  /* The size of the entire file, 4 bytes, 14-17 */
+  be32 = htobe32(calculate_dungeon_size(d) + 14);
+  fwrite(&be32, sizeof (be32), 1, f);
+
+  /* The dungeon map, 76798 bytes, 18-76817 */
   write_dungeon_map(d, f);
 
   /* The room count, 2 bytes, 61454-61455 */
@@ -641,6 +660,9 @@ int write_dungeon(dungeon_t *d)
   /* And the rooms, be16 * 4 bytes, 61456-end */
   write_rooms(d, f);
 
+  fwrite(&d->pc.position[dim_x], 1, 1, f);
+  fwrite(&d->pc.position[dim_y], 1, 1, f);
+
   fclose(f);
 
   return 0;
@@ -649,7 +671,7 @@ int write_dungeon(dungeon_t *d)
 static int read_dungeon_map(dungeon_t *d, FILE *f)
 {
   uint32_t x, y;
-  uint8_t open, room, corr;
+  uint8_t open, room, corr, stair;
 
   for (y = 0; y < DUNGEON_Y; y++) {
     for (x = 0; x < DUNGEON_X; x++) {
@@ -657,10 +679,15 @@ static int read_dungeon_map(dungeon_t *d, FILE *f)
       fread(&room, sizeof (room), 1, f);
       fread(&corr, sizeof (corr), 1, f);
       fread(&hardnessxy(x, y), sizeof (hardnessxy(x, y)), 1, f);
+      fread(&stair, sizeof (stair), 1, f);
       if (room) {
         mapxy(x, y) = ter_floor_room;
       } else if (corr) {
         mapxy(x, y) = ter_floor_hall;
+      } else if (stair == 1) {
+        mapxy(x, y) = ter_stairs_down;
+      } else if (stair == 2) {
+        mapxy(x, y) = ter_stairs_up;
       } else if (y == 0 || y == DUNGEON_Y - 1 ||
                  x == 0 || x == DUNGEON_X - 1) {
         mapxy(x, y) = ter_wall_immutable;
@@ -748,12 +775,17 @@ int read_dungeon(dungeon_t *d, char *file)
     exit(-1);
   }
   fread(&be32, sizeof (be32), 1, f);
-  if (be32toh(be32) != 0) { /* Since we expect zero, be32toh() is a no-op. */
+  if (be32toh(be32) != 1) { /* Since we expect zero, be32toh() is a no-op. */
     fprintf(stderr, "File version mismatch.\n");
     exit(-1);
   }
   fread(&be32, sizeof (be32), 1, f);
   if (buf.st_size - 14 != be32toh(be32)) {
+    fprintf(stderr, "File size mismatch.\n");
+    exit(-1);
+  }
+  fread(&be32, sizeof (be32), 1, f);
+  if (buf.st_size != be32toh(be32)) {
     fprintf(stderr, "File size mismatch.\n");
     exit(-1);
   }
@@ -765,6 +797,9 @@ int read_dungeon(dungeon_t *d, char *file)
     exit(-1);
   }
   read_rooms(d, f);
+
+  fread(&d->pc.position[dim_x], 1, 1, f);
+  fread(&d->pc.position[dim_y], 1, 1, f);
 
   fclose(f);
 
