@@ -3,8 +3,8 @@ CXX = g++
 ECHO = echo
 RM = rm -f
 
-CFLAGS = -Wall -ggdb
-CXXFLAGS = -Wall -ggdb
+CFLAGS = -Wall -Werror -ggdb
+CXXFLAGS = -Wall -Werror -ggdb
 LDFLAGS = -lncurses
 
 BIN = rlg229
