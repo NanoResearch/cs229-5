@@ -1,8 +1,10 @@
 CC = gcc
+CXX = g++
 ECHO = echo
 RM = rm -f
 
-CFLAGS = -Wall -Werror -ggdb
+CFLAGS = -Wall -ggdb
+CXXFLAGS = -Wall -ggdb
 LDFLAGS = -lncurses
 
 BIN = rlg229
@@ -19,6 +21,10 @@ $(BIN): $(OBJS)
 %.o: %.c
 	@$(ECHO) Compiling $<
 	@$(CC) $(CFLAGS) -MMD -MF $*.d -c $<
+
+%.o: %.cpp
+	@$(ECHO) Compiling $<
+	@$(CXX) $(CXXFLAGS) -MMD -MF $*.d -c $<
 
 .PHONY: clean clobber etags
 
