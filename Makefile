@@ -8,13 +8,13 @@ CXXFLAGS = -Wall -Werror -ggdb
 LDFLAGS = -lncurses
 
 BIN = rlg229
-OBJS = rlg229.o dungeon.o move.o utils.o heap.o character.o pc.o npc.o io.o
+OBJS = rlg229.o dungeon.o move.o utils.o heap.o character.o pc.o npc.o io.o parse.o
 
 all: $(BIN) etags
 
 $(BIN): $(OBJS)
 	@$(ECHO) Linking $@
-	@$(CC) $^ -o $@ $(LDFLAGS)
+	@$(CXX) $^ -o $@ $(LDFLAGS)
 
 -include $(OBJS:.o=.d)
 
