@@ -5,6 +5,8 @@
 extern "C" {
 # endif
 
+# include <iostream>
+
 # ifdef __cplusplus
 }
 # endif
