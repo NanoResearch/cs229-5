@@ -5,7 +5,14 @@
 extern "C" {
 # endif
 
-# include <iostream>
+struct dungeon_t;
+
+void parse_monster_descriptions(dungeon_t *d);
+void print_monster_descriptions(dungeon_t *d);
+void destroy_monster_descriptions(dungeon_t *d);
+
+class monster_description {
+};
 
 # ifdef __cplusplus
 }
