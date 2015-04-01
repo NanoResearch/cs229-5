@@ -37,6 +37,9 @@ int main(int argc, char *argv[])
   do_seed = 1;
   nummon = 10;
 
+  parse_monster_descriptions();
+  return 1;
+
   /* The project spec requires '--load' and '--store'.  It's common *
    * to have short and long forms of most switches (assuming you    *
    * don't run out of letters).  For now, we've got plenty.  Long   *
@@ -90,8 +93,6 @@ int main(int argc, char *argv[])
 
   printf("Seed is %ld.\n", seed);
   srand(seed);
-
-  return 1;
 
   io_init_terminal();
   init_dungeon(&d);
