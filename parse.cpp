@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include "parse.h"
+#include <stdlib.h>
 
 void parse_monster_description(std::ifstream &fin, std::string &line)
 {
