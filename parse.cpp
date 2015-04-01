@@ -145,7 +145,7 @@ void parse_monster_descriptions()
 
   filename = getenv("HOME");
   filename += "/.rlg229/monster_desc.txt";
-  fin.open(filename); //open file
+  fin.open(filename.c_str()); //open file
   if (!fin.good()) {
     std::cout << "Monster description text file expected, but not found. Check for file and path mismatch in parse.cpp" << std::endl;
     return; //exit if file not found
