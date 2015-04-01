@@ -1,6 +1,9 @@
+#include <fstream>
 #include <iostream>
-
+#include <string>
+#include <sstream>
 #include "parse.h"
+
 void parse_monster_description(std::ifstream &fin, std::string &line)
 {
   std::string name, desc, symb, color, speed, abil, hp, dam;
