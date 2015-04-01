@@ -2,20 +2,18 @@
 ||  README  ||
 ==============
 
-This program follows all rules set forth by the assignment PDF. It creates a
-randomly generated dungeon with 12 room of varying sizes. All rooms are
-connected by cooridors. The program also has the ability to save and load
-previously created dungeons using the parameters '--save' and/or '--load'.
+This program follows all rules set forth by the assignment PDF. It parses monster descriptions described according
+to the assignment pdf and outputs the result without the separating tokens.
 
 /*
- * Function:    save_dungeon
+ * Function:    parse_monster_descriptions
  * -----------------------------
- * Saves a binary dungeon in the .rlg229 directory in the users HOME folder
- * as a file called dungeon.
+ * parses the description of all the monsters
+ * checks the versioning then loops through parse_monster_description for each monster
  */
 
  /*
- * Function:    load_dungeon
+ * Function:    parse_monster_description
  * -----------------------------
- * Loads the dungeon from its save file in the .rlg229 folder.
+ * parses the description of a single monster at a time
  */

@@ -6,4 +6,29 @@ This assignment branches off of the most recent assignment solution given by the
 
 3/26/15
 ========
-create starting point for assignment based on 1.06 solution
+project setup for assignment 1.07
+
+3/27/15
+========
+update makefile for c++ files and reset change log
+add Werror back to make file
+last makefile fix
+remove code that won't be used for assignment-1.07
+add parse header and cpp file
+
+3/30/15
+========
+add code back to rlg2229 file but terminate early
+test iostream (doesn't work locally)
+test monster description class
+
+3/31/15
+========
+stop main program after pasrsing monster descriptions
+setup parse header file and add monster description class
+add main function for parsing monster descriptions
+add function for parsing each single monster's description
+add required libraries
+add stdlib to parse.cpp
+fix issue with opening file on pyrite
+update CHANGELOG and README
