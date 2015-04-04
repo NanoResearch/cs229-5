@@ -73,7 +73,7 @@ static inline void eat_blankspace(std::ifstream &f)
   }  
 }
 
-static uint32_t parse_monster_name(std::ifstream &f,
+static uint32_t parse_name(std::ifstream &f,
                                    std::string *lookahead,
                                    std::string *name)
 {
@@ -119,7 +119,7 @@ static uint32_t parse_monster_symb(std::ifstream &f,
   return 0;
 }
 
-static uint32_t parse_monster_color(std::ifstream &f,
+static uint32_t parse_color(std::ifstream &f,
                                     std::string *lookahead,
                                     uint32_t *color)
 {
@@ -156,7 +156,7 @@ static uint32_t parse_monster_color(std::ifstream &f,
   return 0;
 }
 
-static uint32_t parse_monster_desc(std::ifstream &f,
+static uint32_t parse_desc(std::ifstream &f,
                                    std::string *lookahead,
                                    std::string *desc)
 {
@@ -319,7 +319,7 @@ static uint32_t parse_monster_description(std::ifstream &f,
        count++) {
     /* This could definately be more concise. */
     if        (*lookahead == "NAME")  {
-      if (read_name || parse_monster_name(f, lookahead, &name)) {
+      if (read_name || parse_name(f, lookahead, &name)) {
         std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
                   << "Parse error in monster name.\n"
                   << "Discarding monster." << std::endl;
@@ -327,7 +327,7 @@ static uint32_t parse_monster_description(std::ifstream &f,
       }
       read_name = true;
     } else if (*lookahead == "DESC")  {
-      if (read_desc || parse_monster_desc(f, lookahead, &desc)) {
+      if (read_desc || parse_desc(f, lookahead, &desc)) {
         std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
                   << "Parse error in monster description.\n"
                   << "Discarding monster." << std::endl;
@@ -343,7 +343,7 @@ static uint32_t parse_monster_description(std::ifstream &f,
       }
       read_symb = true;
     } else if (*lookahead == "COLOR") {
-      if (read_color || parse_monster_color(f, lookahead, &color)) {
+      if (read_color || parse_color(f, lookahead, &color)) {
         std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
                   << "Parse error in monster color.\n"
                   << "Discarding monster." << std::endl;
