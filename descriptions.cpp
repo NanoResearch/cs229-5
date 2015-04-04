@@ -18,6 +18,10 @@
 #define MONSTER_FILE_VERSION           1U
 #define NUM_MONSTER_DESCRIPTION_FIELDS 8
 
+#define ITEM_FILE_SEMANTIC             "RLG229 OBJECT DESCRIPTION"
+#define ITEM_FILE_VERSION              1U
+#define NUM_ITEM_DESCRIPTION_FIELDS    12
+
 static const struct {
   const char *name;
   const uint32_t value;
