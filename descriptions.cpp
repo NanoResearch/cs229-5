@@ -436,6 +436,36 @@ static uint32_t parse_monster_descriptions(std::ifstream &f,
   return 0;
 }
 
+static uint32_t parse_item_descriptions(std::ifstream &f,
+                                        dungeon_t *d,
+                                        std::vector<item_description> *v)
+{
+  std::string s;
+  std::stringstream expected;
+  std::string lookahead;
+
+  expected << ITEM_FILE_SEMANTIC << " " << ITEM_FILE_VERSION;
+
+  eat_whitespace(f);
+
+  getline(f, s);
+
+  if (s != expected.str()) {
+    std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+              << "Parse error in item description file.\nExpected: \""
+              << expected.str() << "\"\nRead:     \"" << s << "\"\n\nAborting."
+              << std::endl;
+    return 1;
+  }
+
+  f >> lookahead;
+  do {
+    parse_item_description(f, &lookahead, v);
+  } while (f.peek() != EOF);
+
+  return 0;
+}
+
 uint32_t parse_descriptions(dungeon_t *d)
 {
   std::string file;
