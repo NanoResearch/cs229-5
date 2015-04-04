@@ -500,6 +500,33 @@ void monster_description::set(const std::string &name,
   this->damage = damage;
 }
 
+void item_description::set(const std::string &name,
+                           const std::string &desc,
+                           const std::string &type,
+                           const uint32_t color,
+                           const dice &hit,
+                           const dice &dam,
+                           const dice &dodge,
+                           const dice &def,
+                           const dice &weight,
+                           const dice &speed,
+                           const dice &attr,
+                           const dice &val)
+{
+  this->name = name;
+  this->desc = desc;
+  this->type = type;
+  this->color = color;
+  this->hit = hit;
+  this->dam = dam;
+  this->dodge = dodge;
+  this->def = def;
+  this->weight = weight;
+  this->speed = speed;
+  this->attr = attr;
+  this->val = val;
+}
+
 std::ostream &monster_description::print(std::ostream& o)
 {
   uint32_t i;
