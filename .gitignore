@@ -2,4 +2,7 @@
 *.gz
 *.out
 *.o
+*.d
+*rlg229
+*TAGS
 /lecture
