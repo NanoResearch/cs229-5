@@ -440,11 +440,15 @@ uint32_t parse_descriptions(dungeon_t *d)
 {
   std::string file;
   std::ifstream f;
-  std::vector<monster_description> *v;
-  uint32_t retval;
+  std::vector<monster_description> *v_monster;
+  std::vector<item_description> *v_item;
+  uint32_t retval_monster;
+  uint32_t retval_item;
 
-  retval = 0;
+  retval_monster = 0;
+  retval_item = 0;
 
+  // Monster descriptions
   file = getenv("HOME");
   if (file.length() == 0) {
     file = ".";
@@ -453,18 +457,39 @@ uint32_t parse_descriptions(dungeon_t *d)
 
   f.open(file.c_str());
 
-  v = new std::vector<monster_description>();
-  d->monster_descriptions = v;
+  v_monster = new std::vector<monster_description>();
+  d->monster_descriptions = v_monster;
 
-  if (parse_monster_descriptions(f, d, v)) {
-    delete v;
+  if (parse_monster_descriptions(f, d, v_monster)) {
+    delete v_monster;
     d->monster_descriptions = 0;
-    retval = 1;
+    retval_monster = 1;
   }
 
   f.close();
 
-  return retval;
+
+  // item descriptions
+  file = getenv("HOME");
+  if (file.length() == 0) {
+    file = ".";
+  }
+  file += std::string("/") + SAVE_DIR + "/" + ITEM_DESC_FILE;
+
+  f.open(file.c_str());
+
+  v_item = new std::vector<item_description>();
+  d->item_descriptions = v_item;
+
+  if (parse_item_descriptions(f, d, v_item)) {
+    delete v_item;
+    d->item_descriptions = 0;
+    retval_item = 1;
+  }
+
+  f.close();
+
+  return retval_monster && retval_item;
 }
 
 uint32_t print_descriptions(dungeon_t *d)
