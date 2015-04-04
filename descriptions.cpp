@@ -157,8 +157,8 @@ static uint32_t parse_color(std::ifstream &f,
 }
 
 static uint32_t parse_desc(std::ifstream &f,
-                                   std::string *lookahead,
-                                   std::string *desc)
+                           std::string *lookahead,
+                           std::string *desc)
 {
   /* DESC is special.  Data doesn't follow on the same line *
    * as the keyword, so we want to eat the newline, too.    */
@@ -404,6 +404,81 @@ static uint32_t parse_monster_description(std::ifstream &f,
   v->push_back(m);
 
   return 0;
+}
+
+static uint32_t parse_item_type(std::ifstream &f,
+                                   std::string *lookahead,
+                                   std::string *type)
+{
+  eat_blankspace(f);
+
+  if (f.peek() == '\n') {
+    return 1;
+  }
+
+  getline(f, *type);
+
+  /* We enter this function with the semantic in the lookahead, so we  *
+   * read a new one so that we're in the same state for the next call. */
+  f >> *lookahead;
+
+  return 0;
+}
+
+static uint32_t parse_item_hit(std::ifstream &f,
+                                 std::string *lookahead,
+                                 dice *hit)
+{
+  return parse_dice(f, lookahead, hit);
+}
+
+static uint32_t parse_item_dam(std::ifstream &f,
+                                 std::string *lookahead,
+                                 dice *dam)
+{
+  return parse_dice(f, lookahead, dam);
+}
+
+static uint32_t parse_item_dodge(std::ifstream &f,
+                                 std::string *lookahead,
+                                 dice *dodge)
+{
+  return parse_dice(f, lookahead, dodge);
+}
+
+static uint32_t parse_item_def(std::ifstream &f,
+                                 std::string *lookahead,
+                                 dice *def)
+{
+  return parse_dice(f, lookahead, def);
+}
+
+static uint32_t parse_item_weight(std::ifstream &f,
+                                 std::string *lookahead,
+                                 dice *weight)
+{
+  return parse_dice(f, lookahead, weight);
+}
+
+static uint32_t parse_item_speed(std::ifstream &f,
+                                 std::string *lookahead,
+                                 dice *speed)
+{
+  return parse_dice(f, lookahead, speed);
+}
+
+static uint32_t parse_item_attr(std::ifstream &f,
+                                 std::string *lookahead,
+                                 dice *attr)
+{
+  return parse_dice(f, lookahead, attr);
+}
+
+static uint32_t parse_item_val(std::ifstream &f,
+                                 std::string *lookahead,
+                                 dice *val)
+{
+  return parse_dice(f, lookahead, val);
 }
 
 static uint32_t parse_item_description(std::ifstream &f,
