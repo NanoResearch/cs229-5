@@ -5,3 +5,23 @@
 4-1-15
 ========
 initial setup starting with assignment-1.07
+
+4-3-15
+========
+add item description definition, typedef, etc. to dungeon header file
+add item description class to description header file
+add definitions for item file semantic, file version, and number of description fields
+simplify parse name, color, and description function name to be more generic
+delete item descriptions in destroy function
+create function for printing item descriptions
+create function for setting item description fields
+add item descriptions to main print descriptions function
+
+4-4-15
+=======
+update parse descriptions function to open and look instide the item descriptions file
+add main function to check item file semantic and loop through descriptions
+add workhorse function for parsing each item description
+add functions to parse each unique field
+fix type in object description file name
+update CHANGELOG and README
