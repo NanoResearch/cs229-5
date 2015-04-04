@@ -406,6 +406,166 @@ static uint32_t parse_monster_description(std::ifstream &f,
   return 0;
 }
 
+static uint32_t parse_item_description(std::ifstream &f,
+                                       std::string *lookahead,
+                                       std::vector<item_description> *v)
+{
+  std::string s;
+  bool read_name, read_desc, read_type, read_color,
+       read_hit, read_dam, read_dodge, read_def, read_weight,
+       read_speed, read_attr, read_val;
+  std::string name, desc, type;
+  uint32_t color;
+  dice hit, dam, dodge, def, weight, speed, attr, val;
+  item_description i;
+  int count;
+
+  read_name = read_desc = read_type = read_color =
+              read_hit = read_dam = read_dodge = read_def =
+              read_weight = read_speed = read_attr = read_val = false;
+
+  if (*lookahead != "BEGIN") {
+    std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+              << "Parse error in item description.\n"
+              << *lookahead << std::endl
+              << "Discarding item." << std::endl;
+    do {
+      f >> *lookahead;
+    } while (*lookahead != "BEGIN" && f.peek() != EOF);
+  }
+  if (f.peek() == EOF) {
+    return 1;
+  }
+  f >> *lookahead;
+  if (*lookahead != "OBJECT") {
+    return 1;
+  }
+
+  for (f >> *lookahead, count = 0;
+       count < NUM_ITEM_DESCRIPTION_FIELDS;
+       count++) {
+
+    if        (*lookahead == "NAME") {
+      if (read_name || parse_name(f, lookahead, &name)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item name.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_name = true;
+    } else if (*lookahead == "DESC") {
+      if (read_desc || parse_desc(f, lookahead, &desc)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item desc.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_desc = true;
+    } else if (*lookahead == "TYPE") {
+      if (read_type || parse_item_type(f, lookahead, &type)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item type.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_type = true;
+    } else if (*lookahead == "COLOR") {
+      if (read_color || parse_color(f, lookahead, &color)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item color.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_color = true;
+    } else if (*lookahead == "HIT") {
+      if (read_hit || parse_item_hit(f, lookahead, &hit)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item hit.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_hit = true;
+    } else if (*lookahead == "DAM") {
+      if (read_dam || parse_item_dam(f, lookahead, &dam)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item dam.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_dam = true;
+    } else if (*lookahead == "DODGE") {
+      if (read_dodge || parse_item_dodge(f, lookahead, &dodge)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item dodge.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_dodge = true;
+    } else if (*lookahead == "DEF") {
+      if (read_def || parse_item_def(f, lookahead, &def)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item def.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_def = true;
+    } else if (*lookahead == "WEIGHT") {
+      if (read_weight || parse_item_weight(f, lookahead, &weight)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item weight.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_weight = true;
+    } else if (*lookahead == "SPEED") {
+      if (read_speed || parse_item_speed(f, lookahead, &speed)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item speed.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_speed = true;
+    } else if (*lookahead == "ATTR") {
+      if (read_attr || parse_item_attr(f, lookahead, &attr)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item attr.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_attr = true;
+    } else if (*lookahead == "VAL") {
+      if (read_val || parse_item_val(f, lookahead, &val)) {
+        std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                  << "Parse error in item val.\n"
+                  << "Discarding item." << std::endl;
+        return 1;
+      }
+      read_val = true;
+    } else {
+      std::cerr << "Discovered at " << __FILE__ << ":" << __LINE__ << "\n"
+                << "Parse error in item description.\n"
+                << "Discarding item." << std::endl;
+      return 1;
+    }
+  }
+
+  if (*lookahead != "END") {
+    return 1;
+  }
+
+  eat_blankspace(f);
+  if (f.peek() != '\n' && f.peek() != EOF) {
+    return 1;
+  }
+  f >> *lookahead;
+
+  i.set(name, desc, type, color, hit, dam, dodge, def, weight,
+        speed, attr, val);
+  v->push_back(i);
+
+  return 0;
+}
+
 static uint32_t parse_monster_descriptions(std::ifstream &f,
                                            dungeon_t *d,
                                            std::vector<monster_description> *v)
