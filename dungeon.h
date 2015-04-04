@@ -23,7 +23,7 @@ extern "C" {
 #define SAVE_DIR               ".rlg229"
 #define DUNGEON_SAVE_FILE      "dungeon"
 #define MONSTER_DESC_FILE      "monster_desc.txt"
-#define ITEM_DESC_FILE         "object.desc.txt"
+#define ITEM_DESC_FILE         "object_desc.txt"
 #define DUNGEON_SAVE_SEMANTIC  "RLG229"
 #define DUNGEON_SAVE_VERSION   1U
 #define VISUAL_RANGE           30
