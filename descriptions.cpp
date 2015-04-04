@@ -530,6 +530,40 @@ std::ostream &monster_description::print(std::ostream& o)
   return o;
 }
 
+std::ostream &item_description::print(std::ostream& o)
+{
+  uint32_t i;
+
+  o << name << std::endl;
+  o << desc << std::endl;
+  o << type << std::endl;
+  for (i = 0; colors_lookup[i].name; i++) {
+    if (color == colors_lookup[i].value) {
+      o << colors_lookup[i].name << std::endl;
+      break;
+    }
+  }
+  hit.print(o);
+  o << std::endl;
+  dam.print(o);
+  o << std::endl;
+  dodge.print(o);
+  o << std::endl;
+  def.print(o);
+  o << std::endl;
+  weight.print(o);
+  o << std::endl;
+  speed.print(o);
+  o << std::endl;
+  attr.print(o);
+  o << std::endl;
+  val.print(o);
+  o << std::endl;
+  o << std::endl;
+
+  return o; 
+}
+
 uint32_t destroy_descriptions(dungeon_t *d)
 {
   delete (std::vector<monster_description> *) d->monster_descriptions;
