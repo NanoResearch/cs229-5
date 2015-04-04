@@ -469,13 +469,22 @@ uint32_t parse_descriptions(dungeon_t *d)
 
 uint32_t print_descriptions(dungeon_t *d)
 {
-  std::vector<monster_description> *v;
-  std::vector<monster_description>::iterator i;
+  std::vector<monster_description> *v_mon;
+  std::vector<monster_description>::iterator i_mon;
 
-  v = (std::vector<monster_description> *) d->monster_descriptions;
+  v_mon = (std::vector<monster_description> *) d->monster_descriptions;
 
-  for (i = v->begin(); i != v->end(); i++) {
-    i->print(std::cout);
+  for (i_mon = v_mon->begin(); i_mon != v_mon->end(); i_mon++) {
+    i_mon->print(std::cout);
+  }
+
+  std::vector<item_description> *v_item;
+  std::vector<item_description>::iterator i_item;
+
+  v_item = (std::vector<item_description> *) d->item_descriptions;
+
+  for (i_item = v_item->begin(); i_item != v_item->end(); i_item++) {
+    i_item->print(std::cout);
   }
 
   return 0;
