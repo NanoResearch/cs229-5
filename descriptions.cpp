@@ -81,7 +81,8 @@ static const struct {
   type_lu_entry(AMMUNITION),
   type_lu_entry(FOOD),
   type_lu_entry(WANT),
-  type_lu_entry(CONTAINER)
+  type_lu_entry(CONTAINER),
+  { 0, objtype_no_type }
 };
 static inline void eat_whitespace(std::ifstream &f)
 {
@@ -893,7 +894,7 @@ std::ostream &object_description::print(std::ostream &o)
   o << name << std::endl;
   o << description << std::endl;
   for (i = 0; types_lookup[i].name; i++) {
-    if (color == types_lookup[i].value) {
+    if (type == types_lookup[i].value) {
       o << types_lookup[i].name << std::endl;
       break;
     }
