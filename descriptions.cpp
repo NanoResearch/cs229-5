@@ -938,3 +938,38 @@ std::ostream &object_description::print(std::ostream &o)
 
   return o;
 }
+
+std::ostream &object::print(std::ostream &o)
+{
+  uint32_t i;
+
+  o << name << std::endl;
+  o << description << std::endl;
+  o << "Type: ";
+  for (i = 0; types_lookup[i].name; i++) {
+    if (type == types_lookup[i].value) {
+      o << types_lookup[i].name << std::endl;
+      break;
+    }
+  }
+  o << "Color: ";
+  for (i = 0; colors_lookup[i].name; i++) {
+    if (color == colors_lookup[i].value) {
+      o << colors_lookup[i].name << std::endl;
+      break;
+    }
+  }
+  o << "Hit: " << hit << std::endl;
+  o << "Damage: ";
+  damage.print(o);
+  o << std::endl;
+  o << "Dodge: " << dodge << std::endl;
+  o << "Defence: " << defence << std::endl;
+  o << "Weight: " << weight << std::endl;
+  o << "Speed: " << speed << std::endl;
+  o << "Attribute: " << attribute << std::endl;
+  o << "Value: " << value << std::endl;
+  o << std::endl;
+
+  return o;
+}
