@@ -7,7 +7,10 @@ int32_t dice::roll(void)
   uint32_t i;
 
   for (total = base, i = 0; i < number; i++) {
-    total += 1 + rand_range(0, sides);
+    if (sides > 0)
+    {
+      total += rand_range(1, sides);
+    }
   }
 
   return total;
