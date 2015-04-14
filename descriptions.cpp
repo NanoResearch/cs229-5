@@ -900,6 +900,34 @@ void object_description::set(const std::string &name,
   this->value = value;
 }
 
+object object_description::create_object()
+{
+  object o;
+
+  std::string name, desc;
+  object_type_t type;
+  uint32_t color, hit, dodge, def, weight, speed, attr, val;
+  dice dam;
+
+  name = this->name;
+  desc = this->description;
+  type = this->type;
+  color = this->color;
+  hit = this->hit.roll();
+  dodge = this->dodge.roll();
+  def = this->defence.roll();
+  weight = this->weight.roll();
+  speed = this->speed.roll();
+  attr = this->attribute.roll();
+  val = this->value.roll();
+  dam = this->damage;
+
+  o.set(name, desc, type, color, hit,
+        dodge, def, weight, speed, attr, val, dam);
+
+  return o;
+}
+
 std::ostream &object_description::print(std::ostream &o)
 {
   uint32_t i;

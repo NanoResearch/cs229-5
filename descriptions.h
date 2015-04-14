@@ -120,6 +120,7 @@ class object_description {
            const dice &speed,
            const dice &attrubute,
            const dice &value);
+  object create_object();
   std::ostream &print(std::ostream &o);
 };
 
