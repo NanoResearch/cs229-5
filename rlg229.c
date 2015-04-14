@@ -94,6 +94,8 @@ int main(int argc, char *argv[])
 
   parse_descriptions(&d);
   print_descriptions(&d);
+  create_objects(&d);
+  destroy_objects(&d);
   destroy_descriptions(&d);
   return 0;
 

@@ -800,6 +800,19 @@ uint32_t print_descriptions(dungeon_t *d)
   return 0;
 }
 
+uint32_t create_objects(dungeon_t *d)
+{
+  return 0;
+}
+
+uint32_t destroy_objects(dungeon_t *d)
+{
+  delete (std::vector<object> *) d->objects;
+  d->objects = NULL;
+
+  return 0;
+}
+
 void monster_description::set(const std::string &name,
                               const std::string &description,
                               const char symbol,
