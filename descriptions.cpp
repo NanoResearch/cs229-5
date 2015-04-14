@@ -939,6 +939,33 @@ std::ostream &object_description::print(std::ostream &o)
   return o;
 }
 
+void object::set(const std::string &name,
+                 const std::string &description,
+                 const object_type_t type,
+                 const uint32_t color,
+                 const uint32_t &hit,
+                 const uint32_t &dodge,
+                 const uint32_t &defence,
+                 const uint32_t &weight,
+                 const uint32_t &speed,
+                 const uint32_t &attrubute,
+                 const uint32_t &value,
+                 const dice &damage)
+{
+  this->name = name;
+  this->description = description;
+  this->type = type;
+  this->color = color;
+  this->hit = hit;
+  this->dodge = dodge;
+  this->defence = defence;
+  this->weight = weight;
+  this->speed = speed;
+  this->attribute = attrubute;
+  this->value = value;
+  this->damage = damage;
+}
+
 std::ostream &object::print(std::ostream &o)
 {
   uint32_t i;
