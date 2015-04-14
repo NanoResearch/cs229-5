@@ -89,7 +89,7 @@ public:
            const uint32_t &defence,
            const uint32_t &weight,
            const uint32_t &speed,
-           const uint32_t &attrubute,
+           const uint32_t &attribute,
            const uint32_t &value,
            const dice &damage);
   std::ostream &print(std::ostream &o);
