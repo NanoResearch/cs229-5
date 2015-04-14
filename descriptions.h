@@ -65,6 +65,34 @@ class monster_description {
   std::ostream &print(std::ostream &o);
 };
 
+class object {
+private:
+  std::string name, description;
+  object_type_t type;
+  uint32_t color, hit, dodge, defence, weight, speed, attribute, value;
+  dice damage;
+public:
+  object() : name(),    description(),  type(objtype_no_type),
+             color(0),  hit(0),         dodge(0),
+             defence(0),     weight(0), speed(0),
+             attribute(0),   value(0),  damage()
+  {
+  }
+  void set(const std::string &name,
+           const std::string &description,
+           const object_type_t type,
+           const uint32_t color,
+           const uint32_t &hit,
+           const uint32_t &dodge,
+           const uint32_t &defence,
+           const uint32_t &weight,
+           const uint32_t &speed,
+           const uint32_t &attrubute,
+           const uint32_t &value,
+           const dice &damage);
+  std::ostream &print(std::ostream &o);
+};
+
 class object_description {
  private:
   std::string name, description;
