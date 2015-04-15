@@ -3,8 +3,8 @@ CXX = g++
 ECHO = echo
 RM = rm -f
 
-CFLAGS = -Wall -ggdb
-CXXFLAGS = -Wall -ggdb
+CFLAGS = -Wall -Werror -ggdb
+CXXFLAGS = -Wall -Werror -ggdb
 LDFLAGS = -lncurses
 
 BIN = rlg229
@@ -39,4 +39,4 @@ clobber: clean
 
 etags:
 	@$(ECHO) Updating TAGS
-	@etags *.[ch]
+	@etags *.[ch] *.cpp
