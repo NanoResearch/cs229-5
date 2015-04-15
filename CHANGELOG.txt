@@ -2,27 +2,5 @@
 ||  CHANGELOG  ||
 =================
 
-4-13-15
-========
-add object.h file
-1.08 bug patch
-add object.h file
 
-4-14-15
 ========
-delete files with wrong name
-add objects field to the dungeon
-fix dice bug where if a die had 0 sides there would be and error when it was rolled
-add object class
-add functions for creating and destroying objects add function for printing out an object
-add function for printing out an object
-add object setter method
-add factory for creating objects from descriptions
-fix bug with dice
-fix typo
-add recipes for gen_objects ans print_objects to descriptons.h
-add function to print the 10 objects that have been randomly generated
-add function to generate 10 random items for the dungeon
-testing functions in rlg229.c
-add -Werror back to Makefile
-remove unnedded line
