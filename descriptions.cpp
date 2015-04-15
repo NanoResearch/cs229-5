@@ -967,6 +967,8 @@ character_t *generate_monster(dungeon_t *d)
     exit(1);
   }
 
+  memset(c, 0, sizeof (*c));
+
   c->symbol = m.symbol;
   c->color = m.color == COLOR_BLACK ? COLOR_WHITE : m.color;
   room = rand_range(1, d->num_rooms - 1);
@@ -993,6 +995,8 @@ character_t *generate_monster(dungeon_t *d)
     perror("malloc");
     exit(1);
   }
+
+  memset(c->npc, 0, sizeof (*c->npc));
 
   c->npc->characteristics = m.abilities;
   c->npc->have_seen_pc = 0;

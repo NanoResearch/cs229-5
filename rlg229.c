@@ -34,6 +34,8 @@ int main(int argc, char *argv[])
   uint32_t long_arg;
   uint32_t do_huge;
 
+  memset(&d, 0, sizeof (d));
+
   /* Default behavior: Seed with the time, generate a new dungeon, *
    * and don't write to disk.                                      */
   do_seed = 1;
