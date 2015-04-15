@@ -13,6 +13,7 @@
 #include "dungeon.h"
 #include "npc.h"
 #include "dice.h"
+#include "utils.h"
 
 #define MONSTER_FILE_SEMANTIC          "RLG229 MONSTER DESCRIPTION"
 #define MONSTER_FILE_VERSION           1U
@@ -816,6 +817,7 @@ uint32_t print_objects(dungeon_t *d)
 
 uint32_t gen_objects(dungeon_t *d)
 {
+  // object related
   uint32_t i, index;
   object_description desc;
   object new_obj;
@@ -836,6 +838,7 @@ uint32_t gen_objects(dungeon_t *d)
     new_obj = desc.create_object();
     dung_object_vec->push_back(new_obj);
   }
+  
   return 0;
 }
 
@@ -940,6 +943,7 @@ object object_description::create_object()
 
   std::string name, desc;
   object_type_t type;
+  char symbol;
   uint32_t color, hit, dodge, def, weight, speed, attr, val;
   dice dam;
 
@@ -956,7 +960,70 @@ object object_description::create_object()
   val = this->value.roll();
   dam = this->damage;
 
-  o.set(name, desc, type, color, hit,
+  switch(type) {
+    case objtype_no_type:
+      symbol = '*';
+      break;
+    case objtype_WEAPON:
+      symbol = '|';
+      break;
+    case objtype_OFFHAND:
+      symbol = ')';
+      break;
+    case objtype_RANGED:
+      symbol = '}';
+      break;
+    case objtype_ARMOR:
+      symbol = '[';
+      break;
+    case objtype_HELMET:
+      symbol = ']';
+      break;
+    case objtype_CLOAK:
+      symbol = '(';
+      break;
+    case objtype_GLOVES:
+      symbol = '{';
+      break;
+    case objtype_BOOTS:
+      symbol = '\\';
+      break;
+    case objtype_RING:
+      symbol = '=';
+      break;
+    case objtype_AMULET:
+      symbol = '"';
+      break;
+    case objtype_LIGHT:
+      symbol = '_';
+      break;
+    case objtype_SCROLL:
+      symbol = '~';
+      break;
+    case objtype_BOOK:
+      symbol = '?';
+      break;
+    case objtype_FLASK:
+      symbol = '!';
+      break;
+    case objtype_GOLD:
+      symbol = '$';
+      break;
+    case objtype_AMMUNITION:
+      symbol = '/';
+      break;
+    case objtype_FOOD:
+      symbol = ',';
+      break;
+    case objtype_WANT:
+      symbol = '-';
+      break;
+    case objtype_CONTAINER:
+      symbol = '%';
+      break;
+  }
+
+  o.set(name, desc, type, symbol, color, hit,
         dodge, def, weight, speed, attr, val, dam);
 
   return o;
@@ -1004,6 +1071,7 @@ std::ostream &object_description::print(std::ostream &o)
 void object::set(const std::string &name,
                  const std::string &description,
                  const object_type_t type,
+                 const char &symbol,
                  const uint32_t color,
                  const uint32_t &hit,
                  const uint32_t &dodge,
@@ -1017,6 +1085,7 @@ void object::set(const std::string &name,
   this->name = name;
   this->description = description;
   this->type = type;
+  this->symbol = symbol;
   this->color = color;
   this->hit = hit;
   this->dodge = dodge;
@@ -1026,6 +1095,11 @@ void object::set(const std::string &name,
   this->attribute = attrubute;
   this->value = value;
   this->damage = damage;
+}
+
+char object::get_symbol()
+{
+  return this->symbol;
 }
 
 std::ostream &object::print(std::ostream &o)
@@ -1041,6 +1115,7 @@ std::ostream &object::print(std::ostream &o)
       break;
     }
   }
+  o << "Symbol: " << symbol << std::endl;
   o << "Color: ";
   for (i = 0; colors_lookup[i].name; i++) {
     if (color == colors_lookup[i].value) {
