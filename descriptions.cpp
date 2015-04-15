@@ -801,7 +801,19 @@ uint32_t print_descriptions(dungeon_t *d)
 }
 
 uint32_t create_objects(dungeon_t *d)
+uint32_t print_objects(dungeon_t *d)
 {
+  std::vector<object> *o;
+  std::vector<object>::iterator oi;
+
+  o = (std::vector<object> *) d->objects;
+
+  for (oi = o->begin(); oi != o->end(); oi++) {
+    oi->print(std::cout);
+  }
+
+  return 0;
+}
   return 0;
 }
 
