@@ -13,6 +13,9 @@
 #include "dungeon.h"
 #include "npc.h"
 #include "dice.h"
+#include "character.h"
+#include "object.h"
+#include "utils.h"
 
 #define MONSTER_FILE_SEMANTIC          "RLG229 MONSTER DESCRIPTION"
 #define MONSTER_FILE_VERSION           1U
@@ -80,9 +83,34 @@ static const struct {
   type_lu_entry(GOLD),
   type_lu_entry(AMMUNITION),
   type_lu_entry(FOOD),
-  type_lu_entry(WANT),
-  type_lu_entry(CONTAINER)
+  type_lu_entry(WAND),
+  type_lu_entry(CONTAINER),
+  { 0, objtype_no_type }
 };
+
+extern const char object_symbol[] = {
+  '*', /* objtype_no_type */
+  '|', /* objtype_WEAPON */
+  ')', /* objtype_OFFHAND */
+  '}', /* objtype_RANGED */
+  '[', /* objtype_ARMOR */
+  ']', /* objtype_HELMET */
+  '(', /* objtype_CLOAK */
+  '{', /* objtype_GLOVES */
+  '\\', /* objtype_BOOTS */
+  '=', /* objtype_RING */
+  '"', /* objtype_AMULET */
+  '~', /* objtype_LIGHT */
+  '`', /* objtype_SCROLL */
+  '?', /* objtype_BOOK */
+  '!', /* objtype_FLASK */
+  '$', /* objtype_GOLD */
+  '/', /* objtype_AMMUNITION */
+  ',', /* objtype_FOOD */
+  '-', /* objtype_WAND */
+  '%', /* objtype_CONTAINER */
+};
+
 static inline void eat_whitespace(std::ifstream &f)
 {
   while (isspace(f.peek())) {
@@ -923,4 +951,55 @@ std::ostream &object_description::print(std::ostream &o)
   o << std::endl;
 
   return o;
+}
+
+character_t *generate_monster(dungeon_t *d)
+{
+  character_t *c;
+  const std::vector<monster_description> &v =
+    *((std::vector<monster_description> *) d->monster_descriptions);
+  const monster_description &m = v[rand_range(0, v.size() - 1)];
+  uint32_t room;
+  pair_t p;
+
+  if (!(c = (character_t *) malloc(sizeof (*c)))) {
+    perror("malloc");
+    exit(1);
+  }
+
+  c->symbol = m.symbol;
+  c->color = m.color == COLOR_BLACK ? COLOR_WHITE : m.color;
+  room = rand_range(1, d->num_rooms - 1);
+  do {
+    p[dim_y] = rand_range(d->rooms[room].position[dim_y],
+                          (d->rooms[room].position[dim_y] +
+                           d->rooms[room].size[dim_y] - 1));
+    p[dim_x] = rand_range(d->rooms[room].position[dim_x],
+                          (d->rooms[room].position[dim_x] +
+                           d->rooms[room].size[dim_x] - 1));
+  } while (d->character[p[dim_y]][p[dim_x]]);
+  c->position[dim_y] = p[dim_y];
+  c->position[dim_x] = p[dim_x];
+  d->character[p[dim_y]][p[dim_x]] = c;
+  c->speed = m.speed.roll();
+  c->hp = m.hitpoints.roll();
+  c->damage = (const dice_t *) &m.damage;
+  c->next_turn = d->pc.next_turn;
+  c->alive = 1;
+  c->sequence_number = ++d->character_sequence_number;
+  c->pc = NULL;
+  
+  if (!(c->npc = (npc_t *) malloc(sizeof (*(c->npc))))) {
+    perror("malloc");
+    exit(1);
+  }
+
+  c->npc->characteristics = m.abilities;
+  c->npc->have_seen_pc = 0;
+  c->npc->name = (const char *) m.name.c_str();
+  c->npc->description = (const char *) m.description.c_str();
+
+  heap_insert(&d->next_turn, c);
+
+  return c;
 }

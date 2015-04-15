@@ -11,6 +11,7 @@ extern "C" {
 # include "heap.h"
 # include "dims.h"
 # include "character.h"
+# include "object.h"
 
 #define DUNGEON_X              160
 #define DUNGEON_Y              96
@@ -43,7 +44,7 @@ typedef enum __attribute__ ((__packed__)) terrain_type {
   ter_floor,
   ter_floor_room,
   ter_floor_hall,
-  ter_floor_tentative,
+  ter_floor_tunnel,
   ter_stairs,
   ter_stairs_up,
   ter_stairs_down
@@ -63,6 +64,7 @@ typedef void *monster_description_t;
 typedef void *object_description_t;
 
 typedef struct dungeon {
+  uint32_t render_whole_dungeon;
   uint32_t num_rooms;
   room_t rooms[MAX_ROOMS];
   terrain_type_t map[DUNGEON_Y][DUNGEON_X];
@@ -75,10 +77,15 @@ typedef struct dungeon {
    * and pulling in unnecessary data with each map cell would add a lot   *
    * of overhead to the memory system.                                    */
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
+  uint8_t seen[DUNGEON_Y][DUNGEON_X];
   uint16_t num_monsters;
+  uint16_t num_objects;
   uint32_t character_sequence_number;
   character_t *character[DUNGEON_Y][DUNGEON_X];
+  object_t *object[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
+  /* Need 16 bits because these can go to 4 each */
+  uint16_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
   /* pc can be statically allocated; however, that lead to special cases *
    * for the deallocator when cleaning up our turn queue.  Making it     *
    * dynamic simplifies the logic at the expense of one level of         *
