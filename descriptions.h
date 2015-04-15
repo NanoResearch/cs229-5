@@ -16,7 +16,8 @@ extern "C" {
 uint32_t parse_descriptions(dungeon_t *d);
 uint32_t print_descriptions(dungeon_t *d);
 uint32_t destroy_descriptions(dungeon_t *d);
-uint32_t create_objects(dungeon_t *d);
+uint32_t gen_objects(dungeon_t *d);
+uint32_t print_objects(dungeon_t *d);
 uint32_t destroy_objects(dungeon_t *d);
 
 typedef enum object_type {
