@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "move.h"
 #include "io.h"
+#include "dice.h"
 
 void pc_delete(pc_t *pc)
 {
@@ -39,6 +40,8 @@ void config_pc(dungeon_t *d)
   place_pc(d);
 
   d->pc.speed = PC_SPEED;
+  d->pc.hp = PC_HP;
+  d->pc.damage = new_dice(0, 1, 4);
   d->pc.next_turn = 0;
   d->pc.alive = 1;
   d->pc.sequence_number = 0;
