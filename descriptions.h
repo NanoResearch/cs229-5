@@ -39,7 +39,7 @@ typedef enum object_type {
   objtype_GOLD,
   objtype_AMMUNITION,
   objtype_FOOD,
-  objtype_WANT,
+  objtype_WAND,
   objtype_CONTAINER
 } object_type_t;
 

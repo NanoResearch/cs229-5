@@ -81,7 +81,7 @@ static const struct {
   type_lu_entry(GOLD),
   type_lu_entry(AMMUNITION),
   type_lu_entry(FOOD),
-  type_lu_entry(WANT),
+  type_lu_entry(WAND),
   type_lu_entry(CONTAINER),
   { 0, objtype_no_type }
 };
@@ -1015,7 +1015,7 @@ object object_description::create_object()
     case objtype_FOOD:
       symbol = ',';
       break;
-    case objtype_WANT:
+    case objtype_WAND:
       symbol = '-';
       break;
     case objtype_CONTAINER:
