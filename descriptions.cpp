@@ -819,7 +819,6 @@ uint32_t gen_objects(dungeon_t *d)
   uint32_t i, index;
   object_description desc;
   object new_obj;
-  std::srand(std::time(0));
 
   // set up dungeon object vector
   std::vector<object> *dung_object_vec;
