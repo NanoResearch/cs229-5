@@ -800,7 +800,6 @@ uint32_t print_descriptions(dungeon_t *d)
   return 0;
 }
 
-uint32_t create_objects(dungeon_t *d)
 uint32_t print_objects(dungeon_t *d)
 {
   std::vector<object> *o;
@@ -814,6 +813,30 @@ uint32_t print_objects(dungeon_t *d)
 
   return 0;
 }
+
+uint32_t gen_objects(dungeon_t *d)
+{
+  uint32_t i, index;
+  object_description desc;
+  object new_obj;
+  std::srand(std::time(0));
+
+  // set up dungeon object vector
+  std::vector<object> *dung_object_vec;
+  dung_object_vec = new std::vector<object>();
+  d->objects = dung_object_vec;
+
+  // grab object description vector from dungeon
+  std::vector<object_description> *o;
+  o = (std::vector<object_description> *) d->object_descriptions;
+
+  for (i = 0; i < 10; i++)
+  {
+    index = std::rand() % o->size();
+    desc = o->at(index);
+    new_obj = desc.create_object();
+    dung_object_vec->push_back(new_obj);
+  }
   return 0;
 }
 
