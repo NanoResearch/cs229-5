@@ -93,12 +93,14 @@ int main(int argc, char *argv[])
   srand(seed);
 
   parse_descriptions(&d);
-  print_descriptions(&d);
-  gen_objects(&d);
-  print_objects(&d);
-  destroy_objects(&d);
-  destroy_descriptions(&d);
-  return 0;
+  // print_descriptions(&d);
+  // init_dungeon(&d);
+  // gen_dungeon(&d);
+  // gen_objects(&d);
+  // print_objects(&d);
+  // destroy_objects(&d);
+  // destroy_descriptions(&d);
+  // return 0;
 
   io_init_terminal();
   init_dungeon(&d);
@@ -107,6 +109,7 @@ int main(int argc, char *argv[])
     gen_dungeon(&d);
     config_pc(&d);
     gen_monsters(&d, nummon, 0);
+    gen_objects(&d);
   }
 
   io_display(&d);
@@ -139,6 +142,8 @@ int main(int argc, char *argv[])
 
   pc_delete(d.pc.pc);
   delete_dungeon(&d);
+  destroy_objects(&d);
+  destroy_descriptions(&d);
 
   return 0;
 }

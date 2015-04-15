@@ -80,6 +80,7 @@ typedef struct dungeon {
   uint32_t character_sequence_number;
   character_t *character[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
+  char object[DUNGEON_Y][DUNGEON_X];
   /* pc can be statically allocated; however, that lead to special cases *
    * for the deallocator when cleaning up our turn queue.  Making it     *
    * dynamic simplifies the logic at the expense of one level of         *

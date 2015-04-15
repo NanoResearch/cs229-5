@@ -154,6 +154,10 @@ void io_display(dungeon_t *d)
                       [d->io_offset[dim_x] + x]) {
         mvaddch(y, x, d->character[d->io_offset[dim_y] + y]
                                   [d->io_offset[dim_x] + x]->symbol);
+      } else if (d->object[d->io_offset[dim_y] + y]
+                 [d->io_offset[dim_x] + x]) {
+        mvaddch(y, x, d->object[d->io_offset[dim_y] + y]
+                 [d->io_offset[dim_x] + x]);
       } else {
         switch (mapxy(d->io_offset[dim_x] + x,
                       d->io_offset[dim_y] + y)) {

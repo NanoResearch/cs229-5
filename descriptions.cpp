@@ -822,6 +822,10 @@ uint32_t gen_objects(dungeon_t *d)
   object_description desc;
   object new_obj;
 
+  // placement related
+  pair_t p;
+  uint32_t room;
+
   // set up dungeon object vector
   std::vector<object> *dung_object_vec;
   dung_object_vec = new std::vector<object>();
@@ -837,6 +841,17 @@ uint32_t gen_objects(dungeon_t *d)
     desc = o->at(index);
     new_obj = desc.create_object();
     dung_object_vec->push_back(new_obj);
+
+    room = rand_range(1, d->num_rooms - 1);
+    do {
+      p[dim_y] = rand_range(d->rooms[room].position[dim_y],
+                            (d->rooms[room].position[dim_y] +
+                             d->rooms[room].size[dim_y] - 1));
+      p[dim_x] = rand_range(d->rooms[room].position[dim_x],
+                            (d->rooms[room].position[dim_x] +
+                             d->rooms[room].size[dim_x] - 1));
+    } while (d->object[p[dim_y]][p[dim_x]]);
+    d->object[p[dim_y]][p[dim_x]] = new_obj.get_symbol();
   }
   
   return 0;
