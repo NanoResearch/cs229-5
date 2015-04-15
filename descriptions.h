@@ -4,6 +4,8 @@
 # include <stdint.h>
 
 typedef struct dungeon dungeon_t;
+typedef struct character character_t;
+typedef struct object_t object_t;
 
 # ifdef __cplusplus
 
@@ -13,12 +15,12 @@ typedef struct dungeon dungeon_t;
 extern "C" {
 # endif
 
+
 uint32_t parse_descriptions(dungeon_t *d);
 uint32_t print_descriptions(dungeon_t *d);
 uint32_t destroy_descriptions(dungeon_t *d);
-uint32_t gen_objects(dungeon_t *d);
-uint32_t print_objects(dungeon_t *d);
-uint32_t destroy_objects(dungeon_t *d);
+character_t *generate_monster(dungeon_t *d);
+object_t *generate_object(dungeon_t *d);
 
 typedef enum object_type {
   objtype_no_type,
@@ -43,6 +45,8 @@ typedef enum object_type {
   objtype_CONTAINER
 } object_type_t;
 
+extern const char object_symbol[];
+
 # ifdef __cplusplus
 } /* extern "C" */
 
@@ -66,37 +70,8 @@ class monster_description {
            const dice &hitpoints,
            const dice &damage);
   std::ostream &print(std::ostream &o);
-};
 
-class object {
-private:
-  std::string name, description;
-  object_type_t type;
-  char symbol;
-  uint32_t color, hit, dodge, defence, weight, speed, attribute, value;
-  dice damage;
-public:
-  object() : name(),    description(),  type(objtype_no_type),
-             symbol(),  color(0),       hit(0),
-             dodge(0),  defence(0),     weight(0),
-             speed(0),  attribute(0),   value(0),  damage()
-  {
-  }
-  void set(const std::string &name,
-           const std::string &description,
-           const object_type_t type,
-           const char &symbol,
-           const uint32_t color,
-           const uint32_t &hit,
-           const uint32_t &dodge,
-           const uint32_t &defence,
-           const uint32_t &weight,
-           const uint32_t &speed,
-           const uint32_t &attribute,
-           const uint32_t &value,
-           const dice &damage);
-  char get_symbol();
-  std::ostream &print(std::ostream &o);
+  friend character_t *generate_monster(dungeon_t *);
 };
 
 class object_description {
@@ -124,8 +99,23 @@ class object_description {
            const dice &speed,
            const dice &attrubute,
            const dice &value);
-  object create_object();
   std::ostream &print(std::ostream &o);
+  /* Need all these accessors because otherwise there is a *
+   * circular dependancy that is difficult to get around.  */
+  inline const std::string &get_name() const { return name; }
+  inline const std::string &get_description() const { return description; }
+  inline const object_type_t get_type() const { return type; }
+  inline const uint32_t get_color() const { return color; }
+  inline const dice get_hit() const { return hit; }
+  inline const dice get_damage() const { return damage; }
+  inline const dice get_dodge() const { return dodge; }
+  inline const dice get_defence() const { return defence; }
+  inline const dice get_weight() const { return weight; }
+  inline const dice get_speed() const { return speed; }
+  inline const dice get_attribute() const { return attribute; }
+  inline const dice get_value() const { return value; }
+
+  friend void gen_object(dungeon_t *d);
 };
 
 # endif

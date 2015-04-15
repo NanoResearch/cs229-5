@@ -13,6 +13,8 @@
 #include "dungeon.h"
 #include "npc.h"
 #include "dice.h"
+#include "character.h"
+#include "object.h"
 #include "utils.h"
 
 #define MONSTER_FILE_SEMANTIC          "RLG229 MONSTER DESCRIPTION"
@@ -85,6 +87,30 @@ static const struct {
   type_lu_entry(CONTAINER),
   { 0, objtype_no_type }
 };
+
+extern const char object_symbol[] = {
+  '*', /* objtype_no_type */
+  '|', /* objtype_WEAPON */
+  ')', /* objtype_OFFHAND */
+  '}', /* objtype_RANGED */
+  '[', /* objtype_ARMOR */
+  ']', /* objtype_HELMET */
+  '(', /* objtype_CLOAK */
+  '{', /* objtype_GLOVES */
+  '\\', /* objtype_BOOTS */
+  '=', /* objtype_RING */
+  '"', /* objtype_AMULET */
+  '~', /* objtype_LIGHT */
+  '`', /* objtype_SCROLL */
+  '?', /* objtype_BOOK */
+  '!', /* objtype_FLASK */
+  '$', /* objtype_GOLD */
+  '/', /* objtype_AMMUNITION */
+  ',', /* objtype_FOOD */
+  '-', /* objtype_WAND */
+  '%', /* objtype_CONTAINER */
+};
+
 static inline void eat_whitespace(std::ifstream &f)
 {
   while (isspace(f.peek())) {
@@ -801,70 +827,6 @@ uint32_t print_descriptions(dungeon_t *d)
   return 0;
 }
 
-uint32_t print_objects(dungeon_t *d)
-{
-  std::vector<object> *o;
-  std::vector<object>::iterator oi;
-
-  o = (std::vector<object> *) d->objects;
-
-  for (oi = o->begin(); oi != o->end(); oi++) {
-    oi->print(std::cout);
-  }
-
-  return 0;
-}
-
-uint32_t gen_objects(dungeon_t *d)
-{
-  // object related
-  uint32_t i, index;
-  object_description desc;
-  object new_obj;
-
-  // placement related
-  pair_t p;
-  uint32_t room;
-
-  // set up dungeon object vector
-  std::vector<object> *dung_object_vec;
-  dung_object_vec = new std::vector<object>();
-  d->objects = dung_object_vec;
-
-  // grab object description vector from dungeon
-  std::vector<object_description> *o;
-  o = (std::vector<object_description> *) d->object_descriptions;
-
-  for (i = 0; i < 10; i++)
-  {
-    index = std::rand() % o->size();
-    desc = o->at(index);
-    new_obj = desc.create_object();
-    dung_object_vec->push_back(new_obj);
-
-    room = rand_range(1, d->num_rooms - 1);
-    do {
-      p[dim_y] = rand_range(d->rooms[room].position[dim_y],
-                            (d->rooms[room].position[dim_y] +
-                             d->rooms[room].size[dim_y] - 1));
-      p[dim_x] = rand_range(d->rooms[room].position[dim_x],
-                            (d->rooms[room].position[dim_x] +
-                             d->rooms[room].size[dim_x] - 1));
-    } while (d->object[p[dim_y]][p[dim_x]]);
-    d->object[p[dim_y]][p[dim_x]] = new_obj.get_symbol();
-  }
-  
-  return 0;
-}
-
-uint32_t destroy_objects(dungeon_t *d)
-{
-  delete (std::vector<object> *) d->objects;
-  d->objects = NULL;
-
-  return 0;
-}
-
 void monster_description::set(const std::string &name,
                               const std::string &description,
                               const char symbol,
@@ -952,98 +914,6 @@ void object_description::set(const std::string &name,
   this->value = value;
 }
 
-object object_description::create_object()
-{
-  object o;
-
-  std::string name, desc;
-  object_type_t type;
-  char symbol;
-  uint32_t color, hit, dodge, def, weight, speed, attr, val;
-  dice dam;
-
-  name = this->name;
-  desc = this->description;
-  type = this->type;
-  color = this->color;
-  hit = this->hit.roll();
-  dodge = this->dodge.roll();
-  def = this->defence.roll();
-  weight = this->weight.roll();
-  speed = this->speed.roll();
-  attr = this->attribute.roll();
-  val = this->value.roll();
-  dam = this->damage;
-
-  switch(type) {
-    case objtype_no_type:
-      symbol = '*';
-      break;
-    case objtype_WEAPON:
-      symbol = '|';
-      break;
-    case objtype_OFFHAND:
-      symbol = ')';
-      break;
-    case objtype_RANGED:
-      symbol = '}';
-      break;
-    case objtype_ARMOR:
-      symbol = '[';
-      break;
-    case objtype_HELMET:
-      symbol = ']';
-      break;
-    case objtype_CLOAK:
-      symbol = '(';
-      break;
-    case objtype_GLOVES:
-      symbol = '{';
-      break;
-    case objtype_BOOTS:
-      symbol = '\\';
-      break;
-    case objtype_RING:
-      symbol = '=';
-      break;
-    case objtype_AMULET:
-      symbol = '"';
-      break;
-    case objtype_LIGHT:
-      symbol = '_';
-      break;
-    case objtype_SCROLL:
-      symbol = '~';
-      break;
-    case objtype_BOOK:
-      symbol = '?';
-      break;
-    case objtype_FLASK:
-      symbol = '!';
-      break;
-    case objtype_GOLD:
-      symbol = '$';
-      break;
-    case objtype_AMMUNITION:
-      symbol = '/';
-      break;
-    case objtype_FOOD:
-      symbol = ',';
-      break;
-    case objtype_WAND:
-      symbol = '-';
-      break;
-    case objtype_CONTAINER:
-      symbol = '%';
-      break;
-  }
-
-  o.set(name, desc, type, symbol, color, hit,
-        dodge, def, weight, speed, attr, val, dam);
-
-  return o;
-}
-
 std::ostream &object_description::print(std::ostream &o)
 {
   uint32_t i;
@@ -1051,7 +921,7 @@ std::ostream &object_description::print(std::ostream &o)
   o << name << std::endl;
   o << description << std::endl;
   for (i = 0; types_lookup[i].name; i++) {
-    if (type == types_lookup[i].value) {
+    if (color == types_lookup[i].value) {
       o << types_lookup[i].name << std::endl;
       break;
     }
@@ -1083,72 +953,53 @@ std::ostream &object_description::print(std::ostream &o)
   return o;
 }
 
-void object::set(const std::string &name,
-                 const std::string &description,
-                 const object_type_t type,
-                 const char &symbol,
-                 const uint32_t color,
-                 const uint32_t &hit,
-                 const uint32_t &dodge,
-                 const uint32_t &defence,
-                 const uint32_t &weight,
-                 const uint32_t &speed,
-                 const uint32_t &attrubute,
-                 const uint32_t &value,
-                 const dice &damage)
+character_t *generate_monster(dungeon_t *d)
 {
-  this->name = name;
-  this->description = description;
-  this->type = type;
-  this->symbol = symbol;
-  this->color = color;
-  this->hit = hit;
-  this->dodge = dodge;
-  this->defence = defence;
-  this->weight = weight;
-  this->speed = speed;
-  this->attribute = attrubute;
-  this->value = value;
-  this->damage = damage;
-}
+  character_t *c;
+  const std::vector<monster_description> &v =
+    *((std::vector<monster_description> *) d->monster_descriptions);
+  const monster_description &m = v[rand_range(0, v.size() - 1)];
+  uint32_t room;
+  pair_t p;
 
-char object::get_symbol()
-{
-  return this->symbol;
-}
-
-std::ostream &object::print(std::ostream &o)
-{
-  uint32_t i;
-
-  o << name << std::endl;
-  o << description << std::endl;
-  o << "Type: ";
-  for (i = 0; types_lookup[i].name; i++) {
-    if (type == types_lookup[i].value) {
-      o << types_lookup[i].name << std::endl;
-      break;
-    }
+  if (!(c = (character_t *) malloc(sizeof (*c)))) {
+    perror("malloc");
+    exit(1);
   }
-  o << "Symbol: " << symbol << std::endl;
-  o << "Color: ";
-  for (i = 0; colors_lookup[i].name; i++) {
-    if (color == colors_lookup[i].value) {
-      o << colors_lookup[i].name << std::endl;
-      break;
-    }
-  }
-  o << "Hit: " << hit << std::endl;
-  o << "Damage: ";
-  damage.print(o);
-  o << std::endl;
-  o << "Dodge: " << dodge << std::endl;
-  o << "Defence: " << defence << std::endl;
-  o << "Weight: " << weight << std::endl;
-  o << "Speed: " << speed << std::endl;
-  o << "Attribute: " << attribute << std::endl;
-  o << "Value: " << value << std::endl;
-  o << std::endl;
 
-  return o;
+  c->symbol = m.symbol;
+  c->color = m.color == COLOR_BLACK ? COLOR_WHITE : m.color;
+  room = rand_range(1, d->num_rooms - 1);
+  do {
+    p[dim_y] = rand_range(d->rooms[room].position[dim_y],
+                          (d->rooms[room].position[dim_y] +
+                           d->rooms[room].size[dim_y] - 1));
+    p[dim_x] = rand_range(d->rooms[room].position[dim_x],
+                          (d->rooms[room].position[dim_x] +
+                           d->rooms[room].size[dim_x] - 1));
+  } while (d->character[p[dim_y]][p[dim_x]]);
+  c->position[dim_y] = p[dim_y];
+  c->position[dim_x] = p[dim_x];
+  d->character[p[dim_y]][p[dim_x]] = c;
+  c->speed = m.speed.roll();
+  c->hp = m.hitpoints.roll();
+  c->damage = (const dice_t *) &m.damage;
+  c->next_turn = d->pc.next_turn;
+  c->alive = 1;
+  c->sequence_number = ++d->character_sequence_number;
+  c->pc = NULL;
+  
+  if (!(c->npc = (npc_t *) malloc(sizeof (*(c->npc))))) {
+    perror("malloc");
+    exit(1);
+  }
+
+  c->npc->characteristics = m.abilities;
+  c->npc->have_seen_pc = 0;
+  c->npc->name = (const char *) m.name.c_str();
+  c->npc->description = (const char *) m.description.c_str();
+
+  heap_insert(&d->next_turn, c);
+
+  return c;
 }

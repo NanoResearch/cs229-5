@@ -3,13 +3,13 @@ CXX = g++
 ECHO = echo
 RM = rm -f
 
-CFLAGS = -Wall -Werror -ggdb
-CXXFLAGS = -Wall -Werror -ggdb
+CFLAGS = -Wall -ggdb
+CXXFLAGS = -Wall -ggdb
 LDFLAGS = -lncurses
 
 BIN = rlg229
 OBJS = rlg229.o dungeon.o move.o utils.o heap.o character.o pc.o npc.o io.o \
-       dice.o descriptions.o
+       dice.o descriptions.o object.o
 
 all: $(BIN) etags
 
