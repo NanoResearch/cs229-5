@@ -57,6 +57,11 @@ void config_pc(dungeon_t *d)
 
   dijkstra(d);
   dijkstra_tunnel(d);
+
+  for (int i = 0; i < PC_CARRY; i++)
+  {
+    d->pc.pc->carry[i] = NULL;
+  }
 }
 
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
