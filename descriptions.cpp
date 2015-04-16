@@ -985,7 +985,7 @@ character_t *generate_monster(dungeon_t *d)
   d->character[p[dim_y]][p[dim_x]] = c;
   c->speed = m.speed.roll();
   c->hp = m.hitpoints.roll();
-  c->damage = (dice_t *) &m.damage;
+  c->damage = (const dice_t *) &m.damage;
   c->next_turn = d->pc.next_turn;
   c->alive = 1;
   c->sequence_number = ++d->character_sequence_number;
