@@ -10,10 +10,22 @@
 #include "io.h"
 #include "dice.h"
 
-void pc_delete(pc_t *pc)
+void pc_delete(dungeon_t *d)
 {
-  if (pc) {
-    free(pc);
+  if (d) {
+    destroy_dice(d->pc.damage);
+    if (d->pc.pc)
+    {
+      int i;
+      for (i = 0; i < PC_CARRY; i++)
+      {
+        if (d->pc.pc->carry[i])
+        {
+          free(d->pc.pc->carry[i]);
+        }
+      }
+      free(d->pc.pc);
+    }
   }
 }
 

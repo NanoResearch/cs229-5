@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
     unlink_dungeon();
   }
 
-  pc_delete(d.pc.pc);
+  pc_delete(&d);
   destroy_descriptions(&d);
   delete_dungeon(&d);
 

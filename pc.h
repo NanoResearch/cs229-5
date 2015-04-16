@@ -16,7 +16,7 @@ typedef struct pc {
   object_t *carry[PC_CARRY];
 } pc_t;
 
-void pc_delete(pc_t *pc);
+void pc_delete(dungeon_t *d);
 uint32_t pc_is_alive(dungeon_t *d);
 void config_pc(dungeon_t *d);
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir);
