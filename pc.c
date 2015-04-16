@@ -19,7 +19,7 @@ void pc_delete(dungeon_t *d)
       int i;
       for (i = 0; i < PC_CARRY; i++)
       {
-        if (d->pc.pc->carry[i])
+        if (d->pc.pc->carry[i] != NULL)
         {
           free(d->pc.pc->carry[i]);
         }
