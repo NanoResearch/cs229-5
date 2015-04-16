@@ -4,15 +4,12 @@
 # include <stdint.h>
 
 # include "dims.h"
-# include "object.h"
-# include "dungeon.h"
 
 typedef struct dungeon dungeon_t;
 
 typedef struct pc {
   char name[40];
   char catch_phrase[80];
-  object_t *carry[PC_CARRY];
 } pc_t;
 
 void pc_delete(pc_t *pc);
