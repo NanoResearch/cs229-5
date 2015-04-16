@@ -356,6 +356,24 @@ uint32_t in_corner(dungeon_t *d, character_t *c)
   return num_immutable > 1;
 }
 
+static void check_for_object(dungeon_t *d, pair_t next)
+{
+  if (d->object[next[dim_y]][next[dim_x]] != NULL)
+  {
+    int i;
+    
+    for (i = 0; i < PC_CARRY; i++)
+    {
+      if (d->pc.pc->carry[i] == NULL)
+      {
+        d->pc.pc->carry[i] = d->object[next[dim_y]][next[dim_x]];
+        d->object[next[dim_y]][next[dim_x]] = NULL;
+        break;
+      }
+    }
+  }
+}
+
 static void new_dungeon_level(dungeon_t *d, uint32_t dir)
 {
   /* Eventually up and down will be independantly meaningful. *
@@ -429,6 +447,7 @@ uint32_t move_pc(dungeon_t *d, uint32_t dir)
   }
 
   if ((dir != '>') && (dir != '<') && (mappair(next) >= ter_floor)) {
+    check_for_object(d, next);
     move_character(d, &d->pc, next);
     io_update_offset(d);
     dijkstra(d);
