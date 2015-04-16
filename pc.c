@@ -13,7 +13,7 @@
 void pc_delete(dungeon_t *d)
 {
   if (d) {
-    destroy_dice(d->pc.damage);
+    destroy_dice((dice_t *) d->pc.damage);
     if (d->pc.pc)
     {
       int i;
