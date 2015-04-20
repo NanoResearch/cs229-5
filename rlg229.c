@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
     gen_dungeon(&d);
     config_pc(&d);
     gen_monsters(&d, nummon, 0);
-    gen_objects(&d, 10);
+    gen_objects(&d, NUM_OBJECTS);
   }
 
   io_display(&d);

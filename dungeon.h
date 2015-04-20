@@ -28,6 +28,7 @@ extern "C" {
 #define DUNGEON_SAVE_SEMANTIC  "RLG229"
 #define DUNGEON_SAVE_VERSION   1U
 #define VISUAL_RANGE           30
+#define NUM_OBJECTS            50
 #define PC_SPEED               10
 #define PC_HP                  20
 #define PC_CARRY               2
