@@ -13,7 +13,7 @@ typedef struct pc {
   char name[40];
   char catch_phrase[80];
   object_t a, b, c, d, e, f, g, h, i, j, k, l;
-  object_t *carry[PC_CARRY];
+  object_t carry_slots;
 } pc_t;
 
 void pc_delete(dungeon_t *d);

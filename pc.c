@@ -16,14 +16,6 @@ void pc_delete(dungeon_t *d)
     destroy_dice((dice_t *) d->pc.damage);
     if (d->pc.pc)
     {
-      int i;
-      for (i = 0; i < PC_CARRY; i++)
-      {
-        if (d->pc.pc->carry[i] != NULL)
-        {
-          free(d->pc.pc->carry[i]);
-        }
-      }
       free(d->pc.pc);
     }
   }
@@ -69,12 +61,6 @@ void config_pc(dungeon_t *d)
 
   dijkstra(d);
   dijkstra_tunnel(d);
-
-  int i;
-  for (i = 0; i < PC_CARRY; i++)
-  {
-    d->pc.pc->carry[i] = NULL;
-  }
 }
 
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
