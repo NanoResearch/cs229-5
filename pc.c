@@ -16,14 +16,14 @@ void pc_delete(dungeon_t *d)
     destroy_dice((dice_t *) d->pc.damage);
     if (d->pc.pc)
     {
-      // int i;
-      // for (i = 0; i < PC_CARRY; i++)
-      // {
-      //   if (d->pc.pc->carry[i] != NULL)
-      //   {
-      //     free(d->pc.pc->carry[i]);
-      //   }
-      // }
+      int i;
+      for (i = 0; i < PC_CARRY; i++)
+      {
+        if (d->pc.pc->carry[i] != NULL)
+        {
+          free(d->pc.pc->carry[i]);
+        }
+      }
       free(d->pc.pc);
     }
   }
