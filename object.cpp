@@ -81,7 +81,7 @@ void destroy_objects(dungeon_t *d)
 
   for (y = 0; y < DUNGEON_Y; y++) {
     for (x = 0; x < DUNGEON_X; x++) {
-      if (d->object[y][x] || d->object[y][x] == NULL) {
+      if (d->object[y][x]) {
         delete (object *) d->object[y][x];
         d->object[y][x] = 0;
       }
