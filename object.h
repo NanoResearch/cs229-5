@@ -19,6 +19,10 @@ char get_symbol(object_t *o);
 uint32_t get_color(object_t *o);
 const char * get_obj_name(object_t *o);
 void destroy_objects(dungeon_t *d);
+uint32_t wear_object(dungeon_t *d, char key);
+uint32_t remove_object(dungeon_t *d, char key);
+uint32_t drop_object(dungeon_t *d, char key);
+uint32_t expunge_object(dungeon_t *d, char key);
 
 # ifdef __cplusplus
 

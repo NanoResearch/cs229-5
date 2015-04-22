@@ -93,3 +93,27 @@ void destroy_objects(dungeon_t *d)
     }
   }
 }
+
+// Wear an item. If an item of that type is already equipped, items are swapped.
+uint32_t wear_object(dungeon_t *d, char key)
+{
+  return 0;
+}
+
+// Take off an item. Item goes to an open carry slot.
+uint32_t remove_object(dungeon_t *d, char key)
+{
+  return 0;
+}
+
+// Drop an item. Item goes to floor.
+uint32_t drop_object(dungeon_t *d, char key)
+{
+  return 0;
+}
+
+// Expunge an item from the game. Item is permanently removed from the game.
+uint32_t expunge_object(dungeon_t *d, char key)
+{
+  return 0;
+}
