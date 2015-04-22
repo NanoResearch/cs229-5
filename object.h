@@ -17,6 +17,7 @@ typedef struct object_t {
 void gen_objects(dungeon_t *d, uint32_t numobj);
 char get_symbol(object_t *o);
 uint32_t get_color(object_t *o);
+const char * get_obj_name(object_t *o);
 void destroy_objects(dungeon_t *d);
 
 # ifdef __cplusplus
@@ -39,6 +40,7 @@ class object {
 
   friend char get_symbol(object_t *o);
   friend uint32_t get_color(object_t *o);
+  friend const char * get_obj_name(object_t *o);
 };
 
 # endif

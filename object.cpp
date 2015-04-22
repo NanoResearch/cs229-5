@@ -75,6 +75,11 @@ uint32_t get_color(object_t *o)
           ((object *) o)->color);
 }
 
+const char * get_obj_name(object_t *o)
+{
+  return ((object *) o)->name.c_str();
+}
+
 void destroy_objects(dungeon_t *d)
 {
   uint32_t y, x;
