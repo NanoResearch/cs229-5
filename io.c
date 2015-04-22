@@ -1,9 +1,11 @@
 #include <unistd.h>
 #include <ncurses.h>
+#include <string.h>
 
 #include "io.h"
 #include "move.h"
 #include "object.h"
+#include "pc.h"
 
 /* We're going to be working in a standard 80x24 terminal, and, except when *
  * the PC is near the edges, we're going to restrict it to the centermost   *
@@ -250,6 +252,528 @@ void io_display(dungeon_t *d)
   refresh();
 }
 
+void io_wear_object(dungeon_t *d)
+{
+  uint32_t fail_code;
+  int32_t key;
+  int i;
+
+  clear();
+  mvprintw(0, 0, "Select item to equipt from carried items (0-9)");
+  mvprintw(1, 0, "==============================================");
+  mvprintw(2, 0, "Equipped items:");
+
+  if (d->pc.pc->weapon != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->weapon));
+  } else {
+    mvprintw(3, 0, "Weapon\t(a): (none equipped)\n");
+  }
+  if (d->pc.pc->offhand != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->offhand));
+  } else {
+    mvprintw(4, 0, "Offhand\t(b): (none equipped)\n");
+  }
+  if (d->pc.pc->ranged != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ranged));
+  } else {
+    mvprintw(5, 0, "Ranged\t(c): (none equipped)\n");
+  }
+  if (d->pc.pc->armor != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->armor));
+  } else {
+    mvprintw(6, 0, "Armor\t(d): (none equipped)\n");
+  }
+  if (d->pc.pc->helmet != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->helmet));
+  } else {
+    mvprintw(7, 0, "Helmet\t(e): (none equipped)\n");
+  }
+  if (d->pc.pc->cloak != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->cloak));
+  } else {
+    mvprintw(8, 0, "Cloak\t(f): (none equipped)\n");
+  }
+  if (d->pc.pc->gloves != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+  } else {
+    mvprintw(9, 0, "Gloves\t(g): (none equipped)\n");
+  }
+  if (d->pc.pc->boots != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+  } else {
+    mvprintw(10, 0, "Boots\t(h): (none equipped)\n");
+  }
+  if (d->pc.pc->amulet != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->amulet));
+  } else {
+    mvprintw(11, 0, "Amulet\t(i): (none equipped)\n");
+  }
+  if (d->pc.pc->light != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->light));
+  } else {
+    mvprintw(12, 0, "Light\t(j): (none equipped)\n");
+  }
+  if (d->pc.pc->ring1 != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring1));
+  } else {
+    mvprintw(13, 0, "Ring 1\t(k): (none equipped)\n");
+  }
+  if (d->pc.pc->ring2 != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring2));
+  } else {
+    mvprintw(14, 0, "Ring 2\t(l): (none equipped)\n");
+  }
+
+  mvprintw(16, 0, "Carried items:");
+  for (i = 0; i < PC_CARRY; i++)
+  {
+    if (d->pc.pc->carry_slots[i] != NULL)
+    {
+      mvprintw(i + 17, 0, "Slot %d\t(%d):\t%s\n", get_obj_name(d->pc.pc->carry_slots[i]));
+    } else {
+      mvprintw(i + 17, 0, "Slot %d\t(%d):\t(empty)\n", i, i);
+    }
+  }
+
+  do {
+    if ((key = getch()) == 27 /* ESC */) {
+      io_calculate_offset(d);
+      io_display(d);
+      return;
+    }
+
+    switch (key) {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        fail_code = wear_object(d, key);
+        break;
+      default:
+        fail_code = 1;
+        break;
+    }
+    if (fail_code)
+    {
+      mvprintw(PC_CARRY + 18, 0, "Oops, somthing did not work. Make sure you are using the correct key (0-9) and\n");
+      mvprintw(PC_CARRY + 19, 0, "that you have an item in the selected carried item slot.\n");
+      mvprintw(PC_CARRY + 20, 0, "Hit ESC to exit\n");
+    }
+  } while (fail_code);
+  
+  io_display(d);
+}
+
+void io_remove_object(dungeon_t *d)
+{
+  uint32_t fail_code;
+  int32_t key;
+  int i;
+
+  clear();
+  mvprintw(0, 0, "Select item to take off and put in a carried item slot (a-l)");
+  mvprintw(1, 0, "============================================================");
+  mvprintw(2, 0, "Equipped items:");
+
+  if (d->pc.pc->weapon != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->weapon));
+  } else {
+    mvprintw(3, 0, "Weapon\t(a): (none equipped)\n");
+  }
+  if (d->pc.pc->offhand != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->offhand));
+  } else {
+    mvprintw(4, 0, "Offhand\t(b): (none equipped)\n");
+  }
+  if (d->pc.pc->ranged != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ranged));
+  } else {
+    mvprintw(5, 0, "Ranged\t(c): (none equipped)\n");
+  }
+  if (d->pc.pc->armor != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->armor));
+  } else {
+    mvprintw(6, 0, "Armor\t(d): (none equipped)\n");
+  }
+  if (d->pc.pc->helmet != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->helmet));
+  } else {
+    mvprintw(7, 0, "Helmet\t(e): (none equipped)\n");
+  }
+  if (d->pc.pc->cloak != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->cloak));
+  } else {
+    mvprintw(8, 0, "Cloak\t(f): (none equipped)\n");
+  }
+  if (d->pc.pc->gloves != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+  } else {
+    mvprintw(9, 0, "Gloves\t(g): (none equipped)\n");
+  }
+  if (d->pc.pc->boots != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+  } else {
+    mvprintw(10, 0, "Boots\t(h): (none equipped)\n");
+  }
+  if (d->pc.pc->amulet != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->amulet));
+  } else {
+    mvprintw(11, 0, "Amulet\t(i): (none equipped)\n");
+  }
+  if (d->pc.pc->light != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->light));
+  } else {
+    mvprintw(12, 0, "Light\t(j): (none equipped)\n");
+  }
+  if (d->pc.pc->ring1 != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring1));
+  } else {
+    mvprintw(13, 0, "Ring 1\t(k): (none equipped)\n");
+  }
+  if (d->pc.pc->ring2 != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring2));
+  } else {
+    mvprintw(14, 0, "Ring 2\t(l): (none equipped)\n");
+  }
+
+  mvprintw(16, 0, "Carried items:");
+  for (i = 0; i < PC_CARRY; i++)
+  {
+    if (d->pc.pc->carry_slots[i] != NULL)
+    {
+      mvprintw(i + 17, 0, "Slot %d\t(%d):\t%s\n", get_obj_name(d->pc.pc->carry_slots[i]));
+    } else {
+      mvprintw(i + 17, 0, "Slot %d\t(%d):\t(empty)\n", i, i);
+    }
+  }
+
+  do {
+    if ((key = getch()) == 27 /* ESC */) {
+      io_calculate_offset(d);
+      io_display(d);
+      return;
+    }
+
+    switch (key) {
+      case 'a':
+      case 'b':
+      case 'c':
+      case 'd':
+      case 'e':
+      case 'f':
+      case 'g':
+      case 'h':
+      case 'i':
+      case 'j':
+      case 'k':
+      case 'l':
+        fail_code = remove_object(d, key);
+        break;
+      default:
+        fail_code = 1;
+        break;
+    }
+    if (fail_code)
+    {
+      mvprintw(PC_CARRY + 18, 0, "Oops, somthing did not work. Make sure you are using the correct key (a-l) and\n");
+      mvprintw(PC_CARRY + 19, 0, "that you have an empty slot in your carried items.\n");
+      mvprintw(PC_CARRY + 20, 0, "Hit ESC to exit\n");
+    }
+  } while (fail_code);
+  
+  io_display(d);
+}
+
+void io_drop_object(dungeon_t *d)
+{
+  uint32_t fail_code;
+  int32_t key;
+  int i;
+
+  clear();
+  mvprintw(0, 0, "Select item to drop from your list of carried items (0-9)");
+  mvprintw(1, 0, "=========================================================");
+  mvprintw(2, 0, "Equipped items:");
+
+  if (d->pc.pc->weapon != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->weapon));
+  } else {
+    mvprintw(3, 0, "Weapon\t(a): (none equipped)\n");
+  }
+  if (d->pc.pc->offhand != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->offhand));
+  } else {
+    mvprintw(4, 0, "Offhand\t(b): (none equipped)\n");
+  }
+  if (d->pc.pc->ranged != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ranged));
+  } else {
+    mvprintw(5, 0, "Ranged\t(c): (none equipped)\n");
+  }
+  if (d->pc.pc->armor != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->armor));
+  } else {
+    mvprintw(6, 0, "Armor\t(d): (none equipped)\n");
+  }
+  if (d->pc.pc->helmet != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->helmet));
+  } else {
+    mvprintw(7, 0, "Helmet\t(e): (none equipped)\n");
+  }
+  if (d->pc.pc->cloak != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->cloak));
+  } else {
+    mvprintw(8, 0, "Cloak\t(f): (none equipped)\n");
+  }
+  if (d->pc.pc->gloves != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+  } else {
+    mvprintw(9, 0, "Gloves\t(g): (none equipped)\n");
+  }
+  if (d->pc.pc->boots != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+  } else {
+    mvprintw(10, 0, "Boots\t(h): (none equipped)\n");
+  }
+  if (d->pc.pc->amulet != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->amulet));
+  } else {
+    mvprintw(11, 0, "Amulet\t(i): (none equipped)\n");
+  }
+  if (d->pc.pc->light != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->light));
+  } else {
+    mvprintw(12, 0, "Light\t(j): (none equipped)\n");
+  }
+  if (d->pc.pc->ring1 != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring1));
+  } else {
+    mvprintw(13, 0, "Ring 1\t(k): (none equipped)\n");
+  }
+  if (d->pc.pc->ring2 != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring2));
+  } else {
+    mvprintw(14, 0, "Ring 2\t(l): (none equipped)\n");
+  }
+
+  mvprintw(16, 0, "Carried items:");
+  for (i = 0; i < PC_CARRY; i++)
+  {
+    if (d->pc.pc->carry_slots[i] != NULL)
+    {
+      mvprintw(i + 17, 0, "Slot %d\t(%d):\t%s\n", get_obj_name(d->pc.pc->carry_slots[i]));
+    } else {
+      mvprintw(i + 17, 0, "Slot %d\t(%d):\t(empty)\n", i, i);
+    }
+  }
+
+  do {
+    if ((key = getch()) == 27 /* ESC */) {
+      io_calculate_offset(d);
+      io_display(d);
+      return;
+    }
+
+    switch (key) {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        fail_code = drop_object(d, key);
+        break;
+      default:
+        fail_code = 1;
+        break;
+    }
+    if (fail_code)
+    {
+      mvprintw(PC_CARRY + 18, 0, "Oops, somthing did not work. Make sure you are using the correct key (0-9) and\n");
+      mvprintw(PC_CARRY + 19, 0, "that there isn't an object at your current location.\n");
+      mvprintw(PC_CARRY + 20, 0, "Hit ESC to exit\n");
+    }
+  } while (fail_code);
+  
+  io_display(d);
+}
+
+void io_expunge_object(dungeon_t *d)
+{
+  uint32_t fail_code;
+  int32_t key;
+  int i;
+
+  clear();
+  mvprintw(0, 0, "Select item to expunge from the game (YOU CANNOT UNDO THIS) (0-9)");
+  mvprintw(1, 0, "=================================================================");
+  mvprintw(2, 0, "Equipped items:");
+
+  if (d->pc.pc->weapon != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->weapon));
+  } else {
+    mvprintw(3, 0, "Weapon\t(a): (none equipped)\n");
+  }
+  if (d->pc.pc->offhand != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->offhand));
+  } else {
+    mvprintw(4, 0, "Offhand\t(b): (none equipped)\n");
+  }
+  if (d->pc.pc->ranged != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ranged));
+  } else {
+    mvprintw(5, 0, "Ranged\t(c): (none equipped)\n");
+  }
+  if (d->pc.pc->armor != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->armor));
+  } else {
+    mvprintw(6, 0, "Armor\t(d): (none equipped)\n");
+  }
+  if (d->pc.pc->helmet != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->helmet));
+  } else {
+    mvprintw(7, 0, "Helmet\t(e): (none equipped)\n");
+  }
+  if (d->pc.pc->cloak != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->cloak));
+  } else {
+    mvprintw(8, 0, "Cloak\t(f): (none equipped)\n");
+  }
+  if (d->pc.pc->gloves != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+  } else {
+    mvprintw(9, 0, "Gloves\t(g): (none equipped)\n");
+  }
+  if (d->pc.pc->boots != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+  } else {
+    mvprintw(10, 0, "Boots\t(h): (none equipped)\n");
+  }
+  if (d->pc.pc->amulet != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->amulet));
+  } else {
+    mvprintw(11, 0, "Amulet\t(i): (none equipped)\n");
+  }
+  if (d->pc.pc->light != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->light));
+  } else {
+    mvprintw(12, 0, "Light\t(j): (none equipped)\n");
+  }
+  if (d->pc.pc->ring1 != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring1));
+  } else {
+    mvprintw(13, 0, "Ring 1\t(k): (none equipped)\n");
+  }
+  if (d->pc.pc->ring2 != NULL)
+  {
+    mvprintw(3, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring2));
+  } else {
+    mvprintw(14, 0, "Ring 2\t(l): (none equipped)\n");
+  }
+
+  mvprintw(16, 0, "Carried items:");
+  for (i = 0; i < PC_CARRY; i++)
+  {
+    if (d->pc.pc->carry_slots[i] != NULL)
+    {
+      mvprintw(i + 17, 0, "Slot %d\t(%d):\t%s\n", get_obj_name(d->pc.pc->carry_slots[i]));
+    } else {
+      mvprintw(i + 17, 0, "Slot %d\t(%d):\t(empty)\n", i, i);
+    }
+  }
+
+  do {
+    if ((key = getch()) == 27 /* ESC */) {
+      io_calculate_offset(d);
+      io_display(d);
+      return;
+    }
+
+    switch (key) {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        fail_code = expunge_object(d, key);
+        break;
+      default:
+        fail_code = 1;
+        break;
+    }
+    if (fail_code)
+    {
+      mvprintw(PC_CARRY + 18, 0, "Oops, somthing did not work. Make sure you are using the correct key (0-9).\n");
+      mvprintw(PC_CARRY + 19, 0, "REMEMBER, YOU CANNNOT UNDO THIS!!!!!");
+      mvprintw(PC_CARRY + 20, 0, "Hit ESC to exit\n");
+    }
+  } while (fail_code);
+  
+  io_display(d);
+}
+
 void io_look_mode(dungeon_t *d)
 {
   int32_t key;
@@ -435,6 +959,22 @@ void io_handle_input(dungeon_t *d)
       /* New command.  Return to normal display after displaying some   *
        * special screen.                                                */
       io_display(d);
+      fail_code = 1;
+      break;
+    case 'w':
+      io_wear_object(d);
+      fail_code = 1;
+      break;
+    case 't':
+      io_remove_object(d);
+      fail_code = 1;
+      break;
+    case 'd':
+      io_drop_object(d);
+      fail_code = 1;
+      break;
+    case 'x':
+      io_expunge_object(d);
       fail_code = 1;
       break;
     default:
