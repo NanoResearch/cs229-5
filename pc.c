@@ -36,6 +36,8 @@ void place_pc(dungeon_t *d)
 
 void config_pc(dungeon_t *d)
 {
+  int i;
+
   d->pc.symbol = '@';
   d->pc.color = COLOR_WHITE;
 
@@ -51,6 +53,24 @@ void config_pc(dungeon_t *d)
   strncpy(d->pc.pc->name, "Isabella Garcia-Shapiro", sizeof (d->pc.pc->name));
   strncpy(d->pc.pc->catch_phrase,
           "Whatcha doin'?", sizeof (d->pc.pc->name));
+  d->pc.pc->weapon = NULL;
+  d->pc.pc->offhand = NULL;
+  d->pc.pc->ranged = NULL;
+  d->pc.pc->armor = NULL;
+  d->pc.pc->helmet = NULL;
+  d->pc.pc->cloak = NULL;
+  d->pc.pc->gloves = NULL;
+  d->pc.pc->boots = NULL;
+  d->pc.pc->amulet = NULL;
+  d->pc.pc->light = NULL;
+  d->pc.pc->ring1 = NULL;
+  d->pc.pc->ring2 = NULL;
+
+  for (i = 0; i < PC_CARRY; i++)
+  {
+    d->pc.pc->carry_slots[i] = NULL;
+  }
+
   d->pc.npc = NULL;
 
   d->character[d->pc.position[dim_y]][d->pc.position[dim_x]] = &d->pc;
