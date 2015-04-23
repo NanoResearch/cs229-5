@@ -48,6 +48,7 @@ class object {
   friend char get_symbol(object_t *o);
   friend uint32_t get_color(object_t *o);
   friend const char * get_obj_name(object_t *o);
+  friend object_type_t get_obj_type(object_t *o);
 };
 
 # endif

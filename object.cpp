@@ -5,6 +5,7 @@
 #include "dungeon.h"
 #include "utils.h"
 #include "pc.h"
+#include "descriptions.h"
 
 object::object(const object_description &o, pair_t p, object *next) :
   name(o.get_name()),
@@ -91,6 +92,11 @@ uint32_t get_color(object_t *o)
 const char * get_obj_name(object_t *o)
 {
   return ((object *) o)->name.c_str();
+}
+
+object_type get_obj_type(object_t *o)
+{
+  return ((object *) o)->type;
 }
 
 void destroy_objects(dungeon_t *d)
@@ -211,6 +217,149 @@ void pickup_object(dungeon_t *d, pair_t next)
 // Wear an item. If an item of that type is already equipped, items are swapped.
 uint32_t wear_object(dungeon_t *d, char key)
 {
+  object_type type;
+  uint32_t slot;
+  object_t * temp;
+
+  switch (key)
+  {
+    case '0':
+      if (d->pc.pc->carry_slots[0])
+      {
+        type = get_obj_type(d->pc.pc->carry_slots[0]);
+        slot = 0;
+        break;
+      }
+    case '1':
+      if (d->pc.pc->carry_slots[1])
+      {
+        type = get_obj_type(d->pc.pc->carry_slots[1]);
+        slot = 1;
+        break;
+      }
+    case '2':
+      if (d->pc.pc->carry_slots[2])
+      {
+        type = get_obj_type(d->pc.pc->carry_slots[2]);
+        slot = 2;
+        break;
+      }
+    case '3':
+      if (d->pc.pc->carry_slots[3])
+      {
+        type = get_obj_type(d->pc.pc->carry_slots[3]);
+        slot = 3;
+        break;
+      }
+    case '4':
+      if (d->pc.pc->carry_slots[4])
+      {
+        type = get_obj_type(d->pc.pc->carry_slots[4]);
+        slot = 4;
+        break;
+      }
+    case '5':
+      if (d->pc.pc->carry_slots[5])
+      {
+        type = get_obj_type(d->pc.pc->carry_slots[5]);
+        slot = 5;
+        break;
+      }
+    case '6':
+      if (d->pc.pc->carry_slots[6])
+      {
+        type = get_obj_type(d->pc.pc->carry_slots[6]);
+        slot = 6;
+        break;
+      }
+    case '7':
+      if (d->pc.pc->carry_slots[7])
+      {
+        type = get_obj_type(d->pc.pc->carry_slots[7]);
+        slot = 7;
+        break;
+      }
+    case '8':
+      if (d->pc.pc->carry_slots[8])
+      {
+        type = get_obj_type(d->pc.pc->carry_slots[8]);
+        slot = 8;
+        break;
+      }
+    case '9':
+      if (d->pc.pc->carry_slots[9])
+      {
+        type = get_obj_type(d->pc.pc->carry_slots[9]);
+        slot = 9;
+        break;
+      }
+    default:
+      return 1;
+  }
+
+  switch (type)
+  {
+    case objtype_WEAPON:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->weapon;
+      d->pc.pc->weapon = temp;
+      break;
+    case objtype_OFFHAND:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->offhand;
+      d->pc.pc->offhand = temp;
+      break;
+    case objtype_RANGED:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->ranged;
+      d->pc.pc->ranged = temp;
+      break;
+    case objtype_ARMOR:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->armor;
+      // d->pc.pc->armor = d->pc.pc->carry_slots[slot];
+      d->pc.pc->armor = temp;
+      break;
+    case objtype_HELMET:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->helmet;
+      d->pc.pc->helmet = temp;
+      break;
+    case objtype_CLOAK:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->cloak;
+      d->pc.pc->cloak = temp;
+      break;
+    case objtype_GLOVES:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->gloves;
+      d->pc.pc->gloves = temp;
+      break;
+    case objtype_BOOTS:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->boots;
+      d->pc.pc->boots = temp;
+      break;
+    case objtype_RING:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->ring1;
+      d->pc.pc->ring1 = d->pc.pc->ring2;
+      d->pc.pc->ring2 = temp;
+      break;
+    case objtype_AMULET:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->amulet;
+      d->pc.pc->amulet = temp;
+      break;
+    case objtype_LIGHT:
+      temp = d->pc.pc->carry_slots[slot];
+      d->pc.pc->carry_slots[slot] = d->pc.pc->light;
+      d->pc.pc->light = temp;
+      break;
+    default:
+      return 1;
+  }
+
   return 0;
 }
 
