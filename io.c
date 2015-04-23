@@ -341,7 +341,7 @@ void io_wear_object(dungeon_t *d)
   {
     if (d->pc.pc->carry_slots[i] != NULL)
     {
-      mvprintw(i + 17, 0, "Slot %d\t(%d):\t%s\n", get_obj_name(d->pc.pc->carry_slots[i]));
+      mvprintw(i + 17, 0, "Slot %d\t(%d):\t%s\n", i, i, get_obj_name(d->pc.pc->carry_slots[i]));
     } else {
       mvprintw(i + 17, 0, "Slot %d\t(%d):\t(empty)\n", i, i);
     }
