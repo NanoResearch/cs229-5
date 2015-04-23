@@ -437,7 +437,70 @@ uint32_t wear_object(dungeon_t *d, char key)
 // Take off an item. Item goes to an open carry slot.
 uint32_t remove_object(dungeon_t *d, char key)
 {
-  return 0;
+  uint32_t i;
+
+  for (i = 0; i < PC_CARRY; i++)
+  {
+    if (!d->pc.pc->carry_slots[i])
+    {
+      switch (key) {
+        case 'a':
+          d->pc.pc->carry_slots[i] = d->pc.pc->weapon;
+          d->pc.pc->weapon = 0;
+          break;
+        case 'b':
+          d->pc.pc->carry_slots[i] = d->pc.pc->offhand;
+          d->pc.pc->offhand = 0;
+          break;
+        case 'c':
+          d->pc.pc->carry_slots[i] = d->pc.pc->ranged;
+          d->pc.pc->ranged = 0;
+          break;
+        case 'd':
+          d->pc.pc->carry_slots[i] = d->pc.pc->armor;
+          d->pc.pc->armor = 0;
+          break;
+        case 'e':
+          d->pc.pc->carry_slots[i] = d->pc.pc->helmet;
+          d->pc.pc->helmet = 0;
+          break;
+        case 'f':
+          d->pc.pc->carry_slots[i] = d->pc.pc->cloak;
+          d->pc.pc->cloak = 0;
+          break;
+        case 'g':
+          d->pc.pc->carry_slots[i] = d->pc.pc->gloves;
+          d->pc.pc->gloves = 0;
+          break;
+        case 'h':
+          d->pc.pc->carry_slots[i] = d->pc.pc->boots;
+          d->pc.pc->boots = 0;
+          break;
+        case 'i':
+          d->pc.pc->carry_slots[i] = d->pc.pc->amulet;
+          d->pc.pc->amulet = 0;
+          break;
+        case 'j':
+          d->pc.pc->carry_slots[i] = d->pc.pc->light;
+          d->pc.pc->light = 0;
+          break;
+        case 'k':
+          d->pc.pc->carry_slots[i] = d->pc.pc->ring1;
+          d->pc.pc->ring1 = 0;
+          break;
+        case 'l':
+          d->pc.pc->carry_slots[i] = d->pc.pc->ring2;
+          d->pc.pc->ring2 = 0;
+          break;
+        default:
+          return 1;
+      }
+      calculate_pc_speed(d);
+      return 0;
+    }
+  }
+
+  return 1;
 }
 
 // Drop an item. Item goes to floor.
