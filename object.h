@@ -22,6 +22,7 @@ void destroy_objects(dungeon_t *d);
 void destroy_pc_objects(dungeon_t *d);
 uint32_t location_contains_object(dungeon_t *d, pair_t next);
 void pickup_object(dungeon_t *d, pair_t next);
+void calculate_pc_speed(dungeon_t *d);
 uint32_t wear_object(dungeon_t *d, char key);
 uint32_t remove_object(dungeon_t *d, char key);
 uint32_t drop_object(dungeon_t *d, char key);
@@ -49,6 +50,7 @@ class object {
   friend uint32_t get_color(object_t *o);
   friend const char * get_obj_name(object_t *o);
   friend object_type_t get_obj_type(object_t *o);
+  friend int32_t get_obj_speed(object_t *o);
 };
 
 # endif

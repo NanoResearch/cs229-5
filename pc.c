@@ -66,6 +66,7 @@ void config_pc(dungeon_t *d)
   d->pc.pc->light = NULL;
   d->pc.pc->ring1 = NULL;
   d->pc.pc->ring2 = NULL;
+  d->pc.pc->speed = PC_SPEED;
 
   for (i = 0; i < PC_CARRY; i++)
   {

@@ -322,7 +322,7 @@ void do_moves(dungeon_t *d)
   }
 
   if (pc_is_alive(d) && c == &d->pc) {
-    c->next_turn += (1000 / c->speed);
+    c->next_turn += (1000 / d->pc.pc->speed);
   }
 }
 

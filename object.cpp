@@ -99,6 +99,11 @@ object_type get_obj_type(object_t *o)
   return ((object *) o)->type;
 }
 
+int32_t get_obj_speed(object_t *o)
+{
+  return ((object *) o)->speed;
+}
+
 void destroy_objects(dungeon_t *d)
 {
   uint32_t y, x;
@@ -214,6 +219,69 @@ void pickup_object(dungeon_t *d, pair_t next)
   }
 }
 
+void calculate_pc_speed(dungeon_t *d)
+{
+  int32_t speed;
+
+  speed = PC_SPEED;
+
+  if (d->pc.pc->weapon)
+  {
+    speed += get_obj_speed(d->pc.pc->weapon);
+  }
+  if (d->pc.pc->offhand)
+  {
+    speed += get_obj_speed(d->pc.pc->offhand);
+  }
+  if (d->pc.pc->ranged)
+  {
+    speed += get_obj_speed(d->pc.pc->ranged);
+  }
+  if (d->pc.pc->armor)
+  {
+    speed += get_obj_speed(d->pc.pc->armor);
+  }
+  if (d->pc.pc->helmet)
+  {
+    speed += get_obj_speed(d->pc.pc->helmet);
+  }
+  if (d->pc.pc->cloak)
+  {
+    speed += get_obj_speed(d->pc.pc->cloak);
+  }
+  if (d->pc.pc->gloves)
+  {
+    speed += get_obj_speed(d->pc.pc->gloves);
+  }
+  if (d->pc.pc->boots)
+  {
+    speed += get_obj_speed(d->pc.pc->boots);
+  }
+  if (d->pc.pc->amulet)
+  {
+    speed += get_obj_speed(d->pc.pc->amulet);
+  }
+  if (d->pc.pc->light)
+  {
+    speed += get_obj_speed(d->pc.pc->light);
+  }
+  if (d->pc.pc->ring1)
+  {
+    speed += get_obj_speed(d->pc.pc->ring1);
+  }
+  if (d->pc.pc->ring2)
+  {
+    speed += get_obj_speed(d->pc.pc->ring2);
+  }
+
+  if (speed <= 1)
+  {
+    speed = 2;
+  }
+
+  d->pc.pc->speed = speed;
+}
+
 // Wear an item. If an item of that type is already equipped, items are swapped.
 uint32_t wear_object(dungeon_t *d, char key)
 {
@@ -317,7 +385,6 @@ uint32_t wear_object(dungeon_t *d, char key)
     case objtype_ARMOR:
       temp = d->pc.pc->carry_slots[slot];
       d->pc.pc->carry_slots[slot] = d->pc.pc->armor;
-      // d->pc.pc->armor = d->pc.pc->carry_slots[slot];
       d->pc.pc->armor = temp;
       break;
     case objtype_HELMET:
@@ -342,8 +409,10 @@ uint32_t wear_object(dungeon_t *d, char key)
       break;
     case objtype_RING:
       temp = d->pc.pc->carry_slots[slot];
+      // ring 1 is the previous #2 ring
       d->pc.pc->carry_slots[slot] = d->pc.pc->ring1;
       d->pc.pc->ring1 = d->pc.pc->ring2;
+      // ring 2 is the new ring
       d->pc.pc->ring2 = temp;
       break;
     case objtype_AMULET:
@@ -359,6 +428,8 @@ uint32_t wear_object(dungeon_t *d, char key)
     default:
       return 1;
   }
+
+  calculate_pc_speed(d);
 
   return 0;
 }
