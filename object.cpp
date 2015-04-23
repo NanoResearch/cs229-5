@@ -38,16 +38,28 @@ void gen_object(dungeon_t *d)
   const std::vector<object_description> &v =
     *((std::vector<object_description> *) d->object_descriptions);
   const object_description &od = v[rand_range(0, v.size() - 1)];
-  uint32_t room;
+  uint32_t room, blocked;
   pair_t p;
 
-  room = rand_range(0, d->num_rooms - 1);
-  p[dim_y] = rand_range(d->rooms[room].position[dim_y],
-                        (d->rooms[room].position[dim_y] +
-                         d->rooms[room].size[dim_y] - 1));
-  p[dim_x] = rand_range(d->rooms[room].position[dim_x],
+  do
+  {
+    room = rand_range(0, d->num_rooms - 1);
+    p[dim_y] = rand_range(d->rooms[room].position[dim_y],
+                          (d->rooms[room].position[dim_y] +
+                           d->rooms[room].size[dim_y] - 1));
+    p[dim_x] = rand_range(d->rooms[room].position[dim_x],
                         (d->rooms[room].position[dim_x] +
                          d->rooms[room].size[dim_x] - 1));
+    if (d->object[p[dim_y]][p[dim_x]])
+    {
+      blocked = 1;
+    }
+    else
+    {
+      blocked = 0;
+    }
+
+  } while (blocked);
 
   o = new object(od, p, (object *) d->object[p[dim_y]][p[dim_x]]);
 
