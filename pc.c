@@ -15,6 +15,7 @@ void pc_delete(dungeon_t *d)
   destroy_dice((dice_t *) d->pc.damage);
   if (d->pc.pc)
   {
+    destroy_pc_objects(d);
     free(d->pc.pc);
   }
 }
