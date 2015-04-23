@@ -20,6 +20,8 @@ uint32_t get_color(object_t *o);
 const char * get_obj_name(object_t *o);
 void destroy_objects(dungeon_t *d);
 void destroy_pc_objects(dungeon_t *d);
+uint32_t location_contains_object(dungeon_t *d, pair_t next);
+void pickup_object(dungeon_t *d, pair_t next);
 uint32_t wear_object(dungeon_t *d, char key);
 uint32_t remove_object(dungeon_t *d, char key);
 uint32_t drop_object(dungeon_t *d, char key);

@@ -168,6 +168,34 @@ void destroy_pc_objects(dungeon_t *d)
     d->pc.pc->ring2 = 0;
   }
 }
+
+uint32_t location_contains_object(dungeon_t *d, pair_t next)
+{
+  if (d->object[next[dim_y]][next[dim_x]])
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+void pickup_object(dungeon_t *d, pair_t next)
+{
+  uint32_t i;
+
+  for (i = 0; i < PC_CARRY; i++)
+  {
+    if (!d->pc.pc->carry_slots[i])
+    {
+      d->pc.pc->carry_slots[i] = d->object[next[dim_y]][next[dim_x]];
+      d->object[next[dim_y]][next[dim_x]] = 0;
+      return;
+    }
+  }
+}
+
 // Wear an item. If an item of that type is already equipped, items are swapped.
 uint32_t wear_object(dungeon_t *d, char key)
 {

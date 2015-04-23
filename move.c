@@ -430,6 +430,10 @@ uint32_t move_pc(dungeon_t *d, uint32_t dir)
 
   if ((dir != '>') && (dir != '<') && (mappair(next) >= ter_floor)) {
     move_character(d, &d->pc, next);
+    if (location_contains_object(d, next))
+    {
+      pickup_object(d, next);
+    }
     io_update_offset(d);
     dijkstra(d);
 
