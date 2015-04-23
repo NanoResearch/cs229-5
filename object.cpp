@@ -223,11 +223,105 @@ uint32_t remove_object(dungeon_t *d, char key)
 // Drop an item. Item goes to floor.
 uint32_t drop_object(dungeon_t *d, char key)
 {
+  if (d->object[d->pc.position[dim_y]][d->pc.position[dim_x]])
+  {
+    return 1;
+  }
+  switch (key) {
+    case '0':
+      d->object[d->pc.position[dim_y]][d->pc.position[dim_x]] = d->pc.pc->carry_slots[0];
+      d->pc.pc->carry_slots[0] = 0;
+      break;
+    case '1':
+      d->object[d->pc.position[dim_y]][d->pc.position[dim_x]] = d->pc.pc->carry_slots[1];
+      d->pc.pc->carry_slots[1] = 0;
+      break;
+    case '2':
+      d->object[d->pc.position[dim_y]][d->pc.position[dim_x]] = d->pc.pc->carry_slots[2];
+      d->pc.pc->carry_slots[2] = 0;
+      break;
+    case '3':
+      d->object[d->pc.position[dim_y]][d->pc.position[dim_x]] = d->pc.pc->carry_slots[3];
+      d->pc.pc->carry_slots[3] = 0;
+      break;
+    case '4':
+      d->object[d->pc.position[dim_y]][d->pc.position[dim_x]] = d->pc.pc->carry_slots[4];
+      d->pc.pc->carry_slots[4] = 0;
+      break;
+    case '5':
+      d->object[d->pc.position[dim_y]][d->pc.position[dim_x]] = d->pc.pc->carry_slots[5];
+      d->pc.pc->carry_slots[5] = 0;
+      break;
+    case '6':
+      d->object[d->pc.position[dim_y]][d->pc.position[dim_x]] = d->pc.pc->carry_slots[6];
+      d->pc.pc->carry_slots[6] = 0;
+      break;
+    case '7':
+      d->object[d->pc.position[dim_y]][d->pc.position[dim_x]] = d->pc.pc->carry_slots[7];
+      d->pc.pc->carry_slots[7] = 0;
+      break;
+    case '8':
+      d->object[d->pc.position[dim_y]][d->pc.position[dim_x]] = d->pc.pc->carry_slots[8];
+      d->pc.pc->carry_slots[8] = 0;
+      break;
+    case '9':
+      d->object[d->pc.position[dim_y]][d->pc.position[dim_x]] = d->pc.pc->carry_slots[9];
+      d->pc.pc->carry_slots[9] = 0;
+      break;
+    default:
+      return 1;
+      break;
+  }
   return 0;
 }
 
 // Expunge an item from the game. Item is permanently removed from the game.
 uint32_t expunge_object(dungeon_t *d, char key)
 {
+  switch (key) {
+    case '0':
+      delete (object *) d->pc.pc->carry_slots[0];
+      d->pc.pc->carry_slots[0] = 0;
+      break;
+    case '1':
+      delete (object *) d->pc.pc->carry_slots[1];
+      d->pc.pc->carry_slots[1] = 0;
+      break;
+    case '2':
+      delete (object *) d->pc.pc->carry_slots[2];
+      d->pc.pc->carry_slots[2] = 0;
+      break;
+    case '3':
+      delete (object *) d->pc.pc->carry_slots[3];
+      d->pc.pc->carry_slots[3] = 0;
+      break;
+    case '4':
+      delete (object *) d->pc.pc->carry_slots[4];
+      d->pc.pc->carry_slots[4] = 0;
+      break;
+    case '5':
+      delete (object *) d->pc.pc->carry_slots[5];
+      d->pc.pc->carry_slots[5] = 0;
+      break;
+    case '6':
+      delete (object *) d->pc.pc->carry_slots[6];
+      d->pc.pc->carry_slots[6] = 0;
+      break;
+    case '7':
+      delete (object *) d->pc.pc->carry_slots[7];
+      d->pc.pc->carry_slots[7] = 0;
+      break;
+    case '8':
+      delete (object *) d->pc.pc->carry_slots[8];
+      d->pc.pc->carry_slots[8] = 0;
+      break;
+    case '9':
+      delete (object *) d->pc.pc->carry_slots[9];
+      d->pc.pc->carry_slots[9] = 0;
+      break;
+    default:
+      return 1;
+      break;
+  } 
   return 0;
 }
