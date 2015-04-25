@@ -286,12 +286,13 @@ void move_character(dungeon_t *d, character_t *c, pair_t next)
     if (d->character[next[dim_y]][next[dim_x]])
     {
       calculate_pc_damage(d);
-      d->character[next[dim_y]][next[dim_x]]->hp -= d->pc.pc->next_damage;
+      d->character[next[dim_y]][next[dim_x]]->hp -= d->character[c->position[dim_y]][c->position[dim_x]]->pc->next_damage;
       
       // monster dead
       if (d->character[next[dim_y]][next[dim_x]]->hp <= 0)
       {
         d->character[next[dim_y]][next[dim_x]]->alive = 0;
+        d->character[next[dim_y]][next[dim_x]] = NULL;
         d->num_monsters--;
       }
       return;
@@ -326,6 +327,17 @@ void move_character(dungeon_t *d, character_t *c, pair_t next)
       // displacing monster
       else
       {
+        d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
+        c->position[dim_y] = next[dim_y];
+        c->position[dim_x] = next[dim_x];
+        if (d->character[c->position[dim_y]][c->position[dim_x]]) {
+          d->character[c->position[dim_y]][c->position[dim_x]]->alive = 0;
+          if (d->character[c->position[dim_y]][c->position[dim_x]] != &d->pc) {
+            d->num_monsters--;
+          }
+        }
+        d->character[c->position[dim_y]][c->position[dim_x]] = c;
+
         // d->character[next[dim_y]][next[dim_x]]->alive = 0;
         // d->num_monsters--;
         // d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
