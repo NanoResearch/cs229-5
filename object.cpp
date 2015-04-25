@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "pc.h"
 #include "descriptions.h"
+#include "dice.h"
 
 object::object(const object_description &o, pair_t p, object *next) :
   name(o.get_name()),
@@ -102,6 +103,11 @@ object_type get_obj_type(object_t *o)
 int32_t get_obj_speed(object_t *o)
 {
   return ((object *) o)->speed;
+}
+
+const dice * get_obj_damage(object_t *o)
+{
+  return &((object *) o)->damage;
 }
 
 void destroy_objects(dungeon_t *d)
@@ -280,6 +286,77 @@ void calculate_pc_speed(dungeon_t *d)
   }
 
   d->pc.pc->speed = speed;
+}
+
+void calculate_pc_damage(dungeon_t *d)
+{
+  int32_t damage;
+
+  damage = 0;
+
+  if (d->pc.pc->weapon)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  else
+  {
+    damage += roll_dice((dice_t *) d->pc.damage);
+  }
+  if (d->pc.pc->offhand)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  if (d->pc.pc->ranged)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  if (d->pc.pc->armor)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  if (d->pc.pc->helmet)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  if (d->pc.pc->cloak)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  if (d->pc.pc->gloves)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  if (d->pc.pc->boots)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  if (d->pc.pc->amulet)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  if (d->pc.pc->light)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  if (d->pc.pc->ring1)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+  if (d->pc.pc->ring2)
+  {
+    damage += roll_dice((dice_t *) get_obj_damage(d->pc.pc->weapon));
+  }
+
+  d->pc.pc->next_damage = damage;
+}
+
+void calculate_npc_damage(dungeon_t *d, character_t *c)
+{
+  int32_t damage;
+
+  damage = 0;
+  damage += roll_dice((dice_t *) d->character[c->position[dim_y]][c->position[dim_x]]->damage);
+  d->character[c->position[dim_y]][c->position[dim_x]]->next_damage = damage;
 }
 
 // Wear an item. If an item of that type is already equipped, items are swapped.

@@ -17,6 +17,7 @@ typedef struct character {
   uint32_t speed;
   int32_t hp;
   const dice_t *damage;
+  int32_t next_damage;
   uint32_t next_turn;
   uint32_t alive;
   /* The priority queue is not stable.  It's nice to have a record of *

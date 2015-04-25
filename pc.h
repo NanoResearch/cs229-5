@@ -26,6 +26,7 @@ typedef struct pc {
   object_t * ring2;
   object_t * carry_slots[PC_CARRY];
   int32_t speed;
+  int32_t next_damage;
 } pc_t;
 
 void pc_delete(dungeon_t *d);
