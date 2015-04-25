@@ -326,12 +326,12 @@ void move_character(dungeon_t *d, character_t *c, pair_t next)
       // displacing monster
       else
       {
-        d->character[next[dim_y]][next[dim_x]]->alive = 0;
-        d->num_monsters--;
-        d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
-        c->position[dim_y] = next[dim_y];
-        c->position[dim_x] = next[dim_x];
-        d->character[c->position[dim_y]][c->position[dim_x]] = c;
+        // d->character[next[dim_y]][next[dim_x]]->alive = 0;
+        // d->num_monsters--;
+        // d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
+        // c->position[dim_y] = next[dim_y];
+        // c->position[dim_x] = next[dim_x];
+        // d->character[c->position[dim_y]][c->position[dim_x]] = c;
         return;
       }
     }
