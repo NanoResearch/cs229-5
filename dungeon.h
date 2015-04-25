@@ -30,7 +30,7 @@ extern "C" {
 #define VISUAL_RANGE           30
 #define NUM_OBJECTS            100
 #define PC_SPEED               10
-#define PC_HP                  20
+#define PC_HP                  100
 #define PC_CARRY               10
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
