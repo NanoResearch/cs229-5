@@ -2,5 +2,49 @@
 ||  CHANGELOG  ||
 =================
 
-
+4-21-15
 ========
+fix dice bug and define num_objects for number of objects in the dungeon
+add gitignore
+add pc health
+add damage dice to pc and destroy when deleting pc
+cast dice when destroying
+add slots for equipped items and carried items
+make all pc's object slots null to start with
+add prompts for wearing, takin off, dropping, and expunging
+add method to get an objects name
+add empty classes for wearing, taking off,  dropping and expunging objects
+use void pointers for objects
+
+4-22-15
+=========
+use object_t pointers for objects carried and worn by pc
+add ability to destroy objects held by the pc
+
+4-23-15
+=========
+fix print bug that was giving a seg fault
+setup functions for checking for and adding objects to pc inventory
+for simplicity, stop items from stacking
+fix some bug that caused seg faults in other places
+expunging and dropping objects now works
+more io bug fixes
+wearing objects now works
+speed can now be updated when wearing and removing ovjects
+clean up a ton of io stuff
+you can now take off objects
+
+4-24-15
+=========
+more io type fixes
+
+4-25-15
+=========
+add functions for calculating next pc/npc damage ammount
+increase pc hp
+movement and attacking should work now
+test moving
+more bug fixing with movement
+remove commented out code
+update readme
+update changelog
