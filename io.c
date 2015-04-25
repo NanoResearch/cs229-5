@@ -271,67 +271,67 @@ void io_wear_object(dungeon_t *d)
   }
   if (d->pc.pc->offhand)
   {
-    mvprintw(4, 0, "Offhand\t(a): %s\n", get_obj_name(d->pc.pc->offhand));
+    mvprintw(4, 0, "Offhand\t(b): %s\n", get_obj_name(d->pc.pc->offhand));
   } else {
     mvprintw(4, 0, "Offhand\t(b):\n");
   }
   if (d->pc.pc->ranged)
   {
-    mvprintw(5, 0, "Ranged\t(a): %s\n", get_obj_name(d->pc.pc->ranged));
+    mvprintw(5, 0, "Ranged\t(c): %s\n", get_obj_name(d->pc.pc->ranged));
   } else {
     mvprintw(5, 0, "Ranged\t(c):\n");
   }
   if (d->pc.pc->armor)
   {
-    mvprintw(6, 0, "Armor\t(a): %s\n", get_obj_name(d->pc.pc->armor));
+    mvprintw(6, 0, "Armor\t(d): %s\n", get_obj_name(d->pc.pc->armor));
   } else {
     mvprintw(6, 0, "Armor\t(d):\n");
   }
   if (d->pc.pc->helmet)
   {
-    mvprintw(7, 0, "Helmet\t(a): %s\n", get_obj_name(d->pc.pc->helmet));
+    mvprintw(7, 0, "Helmet\t(e): %s\n", get_obj_name(d->pc.pc->helmet));
   } else {
     mvprintw(7, 0, "Helmet\t(e):\n");
   }
   if (d->pc.pc->cloak)
   {
-    mvprintw(8, 0, "Cloak\t(a): %s\n", get_obj_name(d->pc.pc->cloak));
+    mvprintw(8, 0, "Cloak\t(f): %s\n", get_obj_name(d->pc.pc->cloak));
   } else {
     mvprintw(8, 0, "Cloak\t(f):\n");
   }
   if (d->pc.pc->gloves)
   {
-    mvprintw(9, 0, "Gloves\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+    mvprintw(9, 0, "Gloves\t(g): %s\n", get_obj_name(d->pc.pc->gloves));
   } else {
     mvprintw(9, 0, "Gloves\t(g):\n");
   }
   if (d->pc.pc->boots)
   {
-    mvprintw(10, 0, "Boots\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+    mvprintw(10, 0, "Boots\t(h): %s\n", get_obj_name(d->pc.pc->gloves));
   } else {
     mvprintw(10, 0, "Boots\t(h):\n");
   }
   if (d->pc.pc->amulet)
   {
-    mvprintw(11, 0, "Amulet\t(a): %s\n", get_obj_name(d->pc.pc->amulet));
+    mvprintw(11, 0, "Amulet\t(i): %s\n", get_obj_name(d->pc.pc->amulet));
   } else {
     mvprintw(11, 0, "Amulet\t(i):\n");
   }
   if (d->pc.pc->light)
   {
-    mvprintw(12, 0, "Light\t(a): %s\n", get_obj_name(d->pc.pc->light));
+    mvprintw(12, 0, "Light\t(j): %s\n", get_obj_name(d->pc.pc->light));
   } else {
     mvprintw(12, 0, "Light\t(j):\n");
   }
   if (d->pc.pc->ring1)
   {
-    mvprintw(13, 0, "Ring 1\t(a): %s\n", get_obj_name(d->pc.pc->ring1));
+    mvprintw(13, 0, "Ring 1\t(k): %s\n", get_obj_name(d->pc.pc->ring1));
   } else {
     mvprintw(13, 0, "Ring 1\t(k):\n");
   }
   if (d->pc.pc->ring2)
   {
-    mvprintw(14, 0, "Ring 2\t(a): %s\n", get_obj_name(d->pc.pc->ring2));
+    mvprintw(14, 0, "Ring 2\t(l): %s\n", get_obj_name(d->pc.pc->ring2));
   } else {
     mvprintw(14, 0, "Ring 2\t(l):\n");
   }
@@ -401,67 +401,67 @@ void io_remove_object(dungeon_t *d)
   }
   if (d->pc.pc->offhand)
   {
-    mvprintw(4, 0, "Weapon\t(b): %s\n", get_obj_name(d->pc.pc->offhand));
+    mvprintw(4, 0, "Offhand\t(b): %s\n", get_obj_name(d->pc.pc->offhand));
   } else {
     mvprintw(4, 0, "Offhand\t(b):\n");
   }
   if (d->pc.pc->ranged)
   {
-    mvprintw(5, 0, "Weapon\t(c): %s\n", get_obj_name(d->pc.pc->ranged));
+    mvprintw(5, 0, "Ranged\t(c): %s\n", get_obj_name(d->pc.pc->ranged));
   } else {
     mvprintw(5, 0, "Ranged\t(c):\n");
   }
   if (d->pc.pc->armor)
   {
-    mvprintw(6, 0, "Weapon\t(d): %s\n", get_obj_name(d->pc.pc->armor));
+    mvprintw(6, 0, "Armor\t(d): %s\n", get_obj_name(d->pc.pc->armor));
   } else {
     mvprintw(6, 0, "Armor\t(d):\n");
   }
   if (d->pc.pc->helmet)
   {
-    mvprintw(7, 0, "Weapon\t(e): %s\n", get_obj_name(d->pc.pc->helmet));
+    mvprintw(7, 0, "Helmet\t(e): %s\n", get_obj_name(d->pc.pc->helmet));
   } else {
     mvprintw(7, 0, "Helmet\t(e):\n");
   }
   if (d->pc.pc->cloak)
   {
-    mvprintw(8, 0, "Weapon\t(f): %s\n", get_obj_name(d->pc.pc->cloak));
+    mvprintw(8, 0, "Cloak\t(f): %s\n", get_obj_name(d->pc.pc->cloak));
   } else {
     mvprintw(8, 0, "Cloak\t(f):\n");
   }
   if (d->pc.pc->gloves)
   {
-    mvprintw(9, 0, "Weapon\t(h): %s\n", get_obj_name(d->pc.pc->gloves));
+    mvprintw(9, 0, "Gloves\t(g): %s\n", get_obj_name(d->pc.pc->gloves));
   } else {
     mvprintw(9, 0, "Gloves\t(g):\n");
   }
   if (d->pc.pc->boots)
   {
-    mvprintw(10, 0, "Weapon\t(h): %s\n", get_obj_name(d->pc.pc->gloves));
+    mvprintw(10, 0, "Boots\t(h): %s\n", get_obj_name(d->pc.pc->gloves));
   } else {
     mvprintw(10, 0, "Boots\t(h):\n");
   }
   if (d->pc.pc->amulet)
   {
-    mvprintw(11, 0, "Weapon\t(i): %s\n", get_obj_name(d->pc.pc->amulet));
+    mvprintw(11, 0, "Amulet\t(i): %s\n", get_obj_name(d->pc.pc->amulet));
   } else {
     mvprintw(11, 0, "Amulet\t(i):\n");
   }
   if (d->pc.pc->light)
   {
-    mvprintw(12, 0, "Weapon\t(j): %s\n", get_obj_name(d->pc.pc->light));
+    mvprintw(12, 0, "Light\t(j): %s\n", get_obj_name(d->pc.pc->light));
   } else {
     mvprintw(12, 0, "Light\t(j):\n");
   }
   if (d->pc.pc->ring1)
   {
-    mvprintw(13, 0, "Weapon\t(k): %s\n", get_obj_name(d->pc.pc->ring1));
+    mvprintw(13, 0, "Ring 1\t(k): %s\n", get_obj_name(d->pc.pc->ring1));
   } else {
     mvprintw(13, 0, "Ring 1\t(k):\n");
   }
   if (d->pc.pc->ring2)
   {
-    mvprintw(14, 0, "Weapon\t(l): %s\n", get_obj_name(d->pc.pc->ring2));
+    mvprintw(14, 0, "Ring2\t(l): %s\n", get_obj_name(d->pc.pc->ring2));
   } else {
     mvprintw(14, 0, "Ring 2\t(l):\n");
   }
@@ -533,67 +533,67 @@ void io_drop_object(dungeon_t *d)
   }
   if (d->pc.pc->offhand)
   {
-    mvprintw(4, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->offhand));
+    mvprintw(4, 0, "Offhand\t(b): %s\n", get_obj_name(d->pc.pc->offhand));
   } else {
     mvprintw(4, 0, "Offhand\t(b):\n");
   }
   if (d->pc.pc->ranged)
   {
-    mvprintw(5, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ranged));
+    mvprintw(5, 0, "Ranged\t(c): %s\n", get_obj_name(d->pc.pc->ranged));
   } else {
     mvprintw(5, 0, "Ranged\t(c):\n");
   }
   if (d->pc.pc->armor)
   {
-    mvprintw(6, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->armor));
+    mvprintw(6, 0, "Armor\t(d): %s\n", get_obj_name(d->pc.pc->armor));
   } else {
     mvprintw(6, 0, "Armor\t(d):\n");
   }
   if (d->pc.pc->helmet)
   {
-    mvprintw(7, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->helmet));
+    mvprintw(7, 0, "Helmet\t(e): %s\n", get_obj_name(d->pc.pc->helmet));
   } else {
     mvprintw(7, 0, "Helmet\t(e):\n");
   }
   if (d->pc.pc->cloak)
   {
-    mvprintw(8, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->cloak));
+    mvprintw(8, 0, "Cloak\t(f): %s\n", get_obj_name(d->pc.pc->cloak));
   } else {
     mvprintw(8, 0, "Cloak\t(f):\n");
   }
   if (d->pc.pc->gloves)
   {
-    mvprintw(9, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+    mvprintw(9, 0, "Gloves\t(g): %s\n", get_obj_name(d->pc.pc->gloves));
   } else {
     mvprintw(9, 0, "Gloves\t(g):\n");
   }
   if (d->pc.pc->boots)
   {
-    mvprintw(10, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+    mvprintw(10, 0, "Boots\t(h): %s\n", get_obj_name(d->pc.pc->gloves));
   } else {
     mvprintw(10, 0, "Boots\t(h):\n");
   }
   if (d->pc.pc->amulet)
   {
-    mvprintw(11, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->amulet));
+    mvprintw(11, 0, "Amulet\t(i): %s\n", get_obj_name(d->pc.pc->amulet));
   } else {
     mvprintw(11, 0, "Amulet\t(i):\n");
   }
   if (d->pc.pc->light)
   {
-    mvprintw(12, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->light));
+    mvprintw(12, 0, "Light\t(j): %s\n", get_obj_name(d->pc.pc->light));
   } else {
     mvprintw(12, 0, "Light\t(j):\n");
   }
   if (d->pc.pc->ring1)
   {
-    mvprintw(13, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring1));
+    mvprintw(13, 0, "Ring 1\t(k): %s\n", get_obj_name(d->pc.pc->ring1));
   } else {
     mvprintw(13, 0, "Ring 1\t(k):\n");
   }
   if (d->pc.pc->ring2)
   {
-    mvprintw(14, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring2));
+    mvprintw(14, 0, "Ring 2\t(l): %s\n", get_obj_name(d->pc.pc->ring2));
   } else {
     mvprintw(14, 0, "Ring 2\t(l):\n");
   }
@@ -663,67 +663,67 @@ void io_expunge_object(dungeon_t *d)
   }
   if (d->pc.pc->offhand)
   {
-    mvprintw(4, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->offhand));
+    mvprintw(4, 0, "Offhand\t(b): %s\n", get_obj_name(d->pc.pc->offhand));
   } else {
     mvprintw(4, 0, "Offhand\t(b):\n");
   }
   if (d->pc.pc->ranged)
   {
-    mvprintw(5, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ranged));
+    mvprintw(5, 0, "Ranged\t(c): %s\n", get_obj_name(d->pc.pc->ranged));
   } else {
     mvprintw(5, 0, "Ranged\t(c):\n");
   }
   if (d->pc.pc->armor)
   {
-    mvprintw(6, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->armor));
+    mvprintw(6, 0, "Armor\t(d): %s\n", get_obj_name(d->pc.pc->armor));
   } else {
     mvprintw(6, 0, "Armor\t(d):\n");
   }
   if (d->pc.pc->helmet)
   {
-    mvprintw(7, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->helmet));
+    mvprintw(7, 0, "Helmet\t(e): %s\n", get_obj_name(d->pc.pc->helmet));
   } else {
     mvprintw(7, 0, "Helmet\t(e):\n");
   }
   if (d->pc.pc->cloak)
   {
-    mvprintw(8, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->cloak));
+    mvprintw(8, 0, "Cloak\t(f): %s\n", get_obj_name(d->pc.pc->cloak));
   } else {
     mvprintw(8, 0, "Cloak\t(f):\n");
   }
   if (d->pc.pc->gloves)
   {
-    mvprintw(9, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+    mvprintw(9, 0, "Gloves\t(g): %s\n", get_obj_name(d->pc.pc->gloves));
   } else {
     mvprintw(9, 0, "Gloves\t(g):\n");
   }
   if (d->pc.pc->boots)
   {
-    mvprintw(10, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->gloves));
+    mvprintw(10, 0, "Boots\t(h): %s\n", get_obj_name(d->pc.pc->gloves));
   } else {
     mvprintw(10, 0, "Boots\t(h):\n");
   }
   if (d->pc.pc->amulet)
   {
-    mvprintw(11, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->amulet));
+    mvprintw(11, 0, "Amulet\t(i): %s\n", get_obj_name(d->pc.pc->amulet));
   } else {
     mvprintw(11, 0, "Amulet\t(i):\n");
   }
   if (d->pc.pc->light)
   {
-    mvprintw(12, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->light));
+    mvprintw(12, 0, "Light\t(j): %s\n", get_obj_name(d->pc.pc->light));
   } else {
     mvprintw(12, 0, "Light\t(j):\n");
   }
   if (d->pc.pc->ring1)
   {
-    mvprintw(13, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring1));
+    mvprintw(13, 0, "Ring 1\t(k): %s\n", get_obj_name(d->pc.pc->ring1));
   } else {
     mvprintw(13, 0, "Ring 1\t(k):\n");
   }
   if (d->pc.pc->ring2)
   {
-    mvprintw(14, 0, "Weapon\t(a): %s\n", get_obj_name(d->pc.pc->ring2));
+    mvprintw(14, 0, "Ring 2\t(l): %s\n", get_obj_name(d->pc.pc->ring2));
   } else {
     mvprintw(14, 0, "Ring 2\t(l):\n");
   }
