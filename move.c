@@ -279,16 +279,83 @@ void dijkstra_tunnel(dungeon_t *d)
 
 void move_character(dungeon_t *d, character_t *c, pair_t next)
 {
-  d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
-  c->position[dim_y] = next[dim_y];
-  c->position[dim_x] = next[dim_x];
-  if (d->character[c->position[dim_y]][c->position[dim_x]]) {
-    d->character[c->position[dim_y]][c->position[dim_x]]->alive = 0;
-    if (d->character[c->position[dim_y]][c->position[dim_x]] != &d->pc) {
-      d->num_monsters--;
+  // pc is moving
+  if (d->character[c->position[dim_y]][c->position[dim_x]] == &d->pc)
+  {
+    // attacking monster
+    if (d->character[next[dim_y]][next[dim_x]])
+    {
+      calculate_pc_damage(d);
+      d->character[next[dim_y]][next[dim_x]]->hp -= d->pc.pc->next_damage;
+      
+      // monster dead
+      if (d->character[next[dim_y]][next[dim_x]]->hp <= 0)
+      {
+        d->character[next[dim_y]][next[dim_x]]->alive = 0;
+        d->num_monsters--;
+      }
+      return;
+    }
+    // moving to empty space
+    else
+    {
+      d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
+      c->position[dim_y] = next[dim_y];
+      c->position[dim_x] = next[dim_x];
+      d->character[c->position[dim_y]][c->position[dim_x]] = c;
+      return;
     }
   }
-  d->character[c->position[dim_y]][c->position[dim_x]] = c;
+  // monster is moving
+  else
+  {
+    // attacking pc or displacing monster
+    if (d->character[next[dim_y]][next[dim_x]])
+    {
+      // attacking pc
+      if (d->character[next[dim_y]][next[dim_x]] == &d->pc)
+      {
+        calculate_npc_damage(d, c);
+        d->character[next[dim_y]][next[dim_x]]->hp -= d->character[c->position[dim_y]][c->position[dim_x]]->next_damage;
+        if (d->character[next[dim_y]][next[dim_x]]->hp <= 0)
+        {
+          d->character[next[dim_y]][next[dim_x]]->alive = 0;
+        }
+        return;
+      }
+      // displacing monster
+      else
+      {
+        d->character[next[dim_y]][next[dim_x]]->alive = 0;
+        d->num_monsters--;
+        d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
+        c->position[dim_y] = next[dim_y];
+        c->position[dim_x] = next[dim_x];
+        d->character[c->position[dim_y]][c->position[dim_x]] = c;
+        return;
+      }
+    }
+    // moving to empty space
+    else
+    {
+      d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
+      c->position[dim_y] = next[dim_y];
+      c->position[dim_x] = next[dim_x];
+      d->character[c->position[dim_y]][c->position[dim_x]] = c;
+      return;
+    }
+  }
+
+  // d->character[c->position[dim_y]][c->position[dim_x]] = NULL;
+  // c->position[dim_y] = next[dim_y];
+  // c->position[dim_x] = next[dim_x];
+  // if (d->character[c->position[dim_y]][c->position[dim_x]]) {
+  //   d->character[c->position[dim_y]][c->position[dim_x]]->alive = 0;
+  //   if (d->character[c->position[dim_y]][c->position[dim_x]] != &d->pc) {
+  //     d->num_monsters--;
+  //   }
+  // }
+  // d->character[c->position[dim_y]][c->position[dim_x]] = c;
 }
 
 void do_moves(dungeon_t *d)
